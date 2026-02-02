@@ -2,48 +2,522 @@
 <html lang="en">
 <head>
   <meta charset="utf-8">
-  <title>Dark Gravity Labs — Official Site</title>
+  <title>Dark Gravity Labs</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Business automation for talent agencies">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🪐</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   <style>
-    :root { color-scheme: light dark; --bg:#f5f5f7; --card:#ffffff; --txt:#222; --accent:#3e5cff; }
-    body      { margin:0; font-family:-apple-system,blinkmacsystemfont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; background:var(--bg); color:var(--txt); }
-    .wrap     { max-width:720px; margin:0 auto; padding:3rem 1.5rem; }
-    h1        { font-size:2rem; margin:0 0 .5rem; color:var(--accent); }
-    .card     { background:var(--card); padding:1.5rem 2rem; border-radius:12px; box-shadow:0 4px 12px rgba(0,0,0,.08); }
-    dl        { margin:0; }
-    dt        { font-weight:600; margin-top:1rem; }
-    footer    { margin-top:2rem; font-size:.9rem; opacity:.75; }
-    a { color:var(--accent); text-decoration:none; }
-    a:hover { text-decoration:underline; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    :root {
+      --bg: #0a0a0b;
+      --text: #ffffff;
+      --text-dim: #d1dbe6;
+      --text-muted: #64748b;
+      --border: rgba(255,255,255,0.08);
+      --accent: #5eead4;
+      --accent-dim: rgba(94,234,212,0.15);
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    /* ASCII Background */
+    .ascii-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .ascii-bg pre {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 14px;
+      line-height: 1.4;
+      color: rgba(94,234,212,0.06);
+      white-space: pre;
+      text-align: center;
+    }
+
+    /* Navigation */
+    nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 24px 48px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: linear-gradient(180deg, rgba(10,10,11,0.9) 0%, transparent 100%);
+    }
+
+    .nav-logo {
+      font-weight: 600;
+      font-size: 1rem;
+      color: var(--text);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      letter-spacing: -0.02em;
+    }
+
+    .nav-logo span {
+      font-size: 1.2rem;
+    }
+
+    .nav-cta {
+      background: transparent;
+      color: var(--text);
+      padding: 12px 28px;
+      border-radius: 50px;
+      border: 1px solid var(--border);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.875rem;
+      letter-spacing: 0.02em;
+      transition: all 0.2s;
+    }
+
+    .nav-cta:hover {
+      background: var(--text);
+      color: var(--bg);
+      border-color: var(--text);
+    }
+
+    /* Hero */
+    .hero {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+      align-items: center;
+      padding: 140px 48px 100px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .hero-content {
+      max-width: 600px;
+    }
+
+    h1 {
+      font-size: clamp(3rem, 7vw, 5rem);
+      font-weight: 400;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
+      margin-bottom: 0;
+    }
+
+    .hero-right {
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    .hero-description {
+      font-size: 1.125rem;
+      color: var(--text-dim);
+      line-height: 1.7;
+      font-weight: 400;
+    }
+
+    .hero-cta {
+      display: inline-block;
+      background: transparent;
+      color: var(--text);
+      padding: 16px 40px;
+      border-radius: 50px;
+      border: 1px solid var(--border);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.9rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      transition: all 0.2s;
+      width: fit-content;
+    }
+
+    .hero-cta:hover {
+      background: var(--text);
+      color: var(--bg);
+      border-color: var(--text);
+    }
+
+    .hero-image {
+      margin-top: 80px;
+      grid-column: 1 / -1;
+      width: 100%;
+      max-width: 1200px;
+      margin-left: auto;
+      margin-right: auto;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: linear-gradient(135deg, rgba(94,234,212,0.1) 0%, rgba(100,116,139,0.1) 100%);
+    }
+
+    .hero-image img {
+      width: 100%;
+      height: 400px;
+      object-fit: cover;
+      display: block;
+      filter: saturate(0.9);
+    }
+
+    /* Social Proof Section - Light */
+    .proof {
+      background: linear-gradient(180deg, #e8eeef 0%, #dce4e6 100%);
+      color: #111;
+      padding: 100px 48px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .proof-container {
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .proof-logos {
+      display: flex;
+      align-items: center;
+      gap: 48px;
+      margin-bottom: 64px;
+      flex-wrap: wrap;
+    }
+
+    .proof-logo {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #333;
+      letter-spacing: -0.01em;
+      opacity: 0.7;
+      text-decoration: none;
+    }
+
+    .proof-logo.bp { font-family: 'Helvetica Neue', sans-serif; }
+    .proof-logo.shell { font-style: italic; }
+
+    .proof-headline {
+      font-size: clamp(1.25rem, 3.5vw, 1.75rem);
+      font-weight: 500;
+      letter-spacing: -0.02em;
+      line-height: 1.4;
+      margin-bottom: 56px;
+      max-width: 850px;
+      text-transform: uppercase;
+    }
+
+    .proof-headline .highlight {
+      text-decoration: underline;
+      text-decoration-color: #5eead4;
+      text-underline-offset: 4px;
+    }
+
+    .proof-list {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .proof-item {
+      display: grid;
+      grid-template-columns: 40px 1fr;
+      align-items: center;
+      padding: 24px 0;
+      border-top: 1px solid rgba(0,0,0,0.1);
+      gap: 24px;
+    }
+
+    .proof-item:last-child {
+      border-bottom: 1px solid rgba(0,0,0,0.1);
+    }
+
+    .proof-number {
+      font-size: 0.9rem;
+      font-weight: 400;
+      color: #888;
+    }
+
+    .proof-text {
+      font-size: clamp(0.95rem, 2vw, 1.1rem);
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+    }
+
+    
+    /* CTA Section */
+    .cta-section {
+      padding: 140px 48px;
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      gap: 80px;
+    }
+
+    .cta-portrait {
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 2px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .cta-portrait img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .cta-content h2 {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 400;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 20px;
+    }
+
+    .cta-content p {
+      font-size: 1.1rem;
+      color: var(--text-dim);
+      margin-bottom: 32px;
+      max-width: 500px;
+      line-height: 1.7;
+    }
+
+    .cta-button {
+      display: inline-block;
+      background: transparent;
+      color: var(--text);
+      padding: 16px 40px;
+      border-radius: 50px;
+      border: 1px solid var(--border);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.9rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      transition: all 0.2s;
+    }
+
+    .cta-button:hover {
+      background: var(--text);
+      color: var(--bg);
+      border-color: var(--text);
+    }
+
+    /* Footer */
+    footer {
+      padding: 24px 48px;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: relative;
+      z-index: 1;
+    }
+
+    .footer-info {
+      color: var(--text-muted);
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 900px) {
+      nav {
+        padding: 20px 24px;
+      }
+
+      .hero {
+        grid-template-columns: 1fr;
+        padding: 120px 24px 60px;
+        gap: 32px;
+      }
+
+      .hero-image {
+        margin-top: 48px;
+      }
+
+      .hero-image img {
+        height: 280px;
+      }
+
+      .proof {
+        padding: 64px 24px;
+      }
+
+      .proof-logos {
+        gap: 24px;
+        margin-bottom: 48px;
+      }
+
+      .proof-item {
+        grid-template-columns: 32px 1fr;
+        gap: 16px;
+        padding: 20px 0;
+      }
+
+      .cta-section {
+        padding: 80px 24px;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 40px;
+      }
+
+      .cta-portrait {
+        width: 120px;
+        height: 120px;
+      }
+
+      footer {
+        flex-direction: column;
+        padding: 20px 24px;
+        gap: 8px;
+        text-align: center;
+      }
+    }
   </style>
 </head>
 <body>
-  <main class="wrap">
-    <h1>Dark Gravity Labs</h1>
+  <!-- ASCII Background -->
+  <div class="ascii-bg">
+    <pre>
+                                          +*%#.        .*#%*+
+                                     =#%*.    -+##+-      .*%#=
+                                  +%#-      +#*.  .*#+      -#%+
+                               =%#-       +#*        *#+       -%#=
+                            .#%-        =#*          *#=        -%#.
+                          +%+         -%#-            -#%-         +%+
+                        =%+          +%+                +%+          +%=
+                      -%+          .%#.    .+#####+.    .#%.          +%-
+                    .%#.          -%#.   +#%*-  -*%#+   .#%-          .#%.
+                   +%-           =%#.  =%#-        -#%=  .#%=           -%+
+                 .%#            =#%. .#%-            -%#. .%#=            #%.
+                =%=            +%+  -%#                #%-  +%+            =%=
+               #%            .%#. +%+                  +%+ .#%.            %#
+             .%#            -%#. =%=      +#####+      =%=  #%-            #%.
+            -%+            =%#  +%-     =%*.   .*%=     -%+ .#%=            +%-
+           +%-            +%+ .%#     -%#.       .#%-    #%. +%+            -%+
+          #%.            #%- -%+    .%#.           #%.   +%- -%#            .%#
+         %#            .%#. +%-    +%-      .      -%+   -%+  #%.            #%
+        %#            -%#  +%=   .%#     -+#%#+.    #%.   =%+ .#%-            #%
+       %#            =%#  +%-   -%+    =%*. .*%=   +%-   -%+  #%=            #%
+      ##            +%+  #%.   +%=   -%#.     .#%- =%+   .%#  +%+            ##
+     ##            #%-  #%-   #%.  .%#    =#=   #%. %#   -%#  -%#            ##
+    .#           -%#  .%#   =%=   +%-   =%#%=  -%+ =%=   #%.  #%-           #.
+    #.          =%#   #%.  +%-   #%.  -%#. #%- +%=  -%+ .%#   #%=          .#
+    #          +%+   %#   #%.  =%=  +%+    +%+ %#   .%# #%   +%+          #
+    #         #%-  .%#  .%#  +%-  #%-      -%##%.    #%#%.  -%#         #
+    #        #%   -%#   #%  #%.  %#         +%+      +%+   #%   #%        #
+    #       %#   =%#   %#  %#  .%+                        +%.  #%   #%       #
+    #      ##   +%+   ##  ##  +%                          %+  ##   +%+   ##      #
+    #     .#   #%-   .#  .#  #%                          %#  #.   -%#   #.     #
+    #     #   #%     #  #  %#                          #%  #  #     %#   #     #
+    #    #   %#     #  #  ##                          ##  #  #     #%   #    #
+    #    #  ##     #  #  #.                          .#  #  #     ##  #    #
+     #  #  #.     #  #  #                            #  #  #     .#  #  #
+      ##  #      # .#  #                            #  #. #      #  ##
+         #      # .#  #              ..              #  #. #      #
+               #  #  #           .+#%%#+.           #  #  #
+              #  #  #          =%#=   =#%=          #  #  #
+             #  #  #         +%+         +%+         #  #  #
+            .  #  #.        #%             %#        .#  #  .
+               #  #        %#               #%        #  #
+               #  #       ##                 ##       #  #
+                  #.     .#                   #.     .#
+                  #      #                     #      #
+                  #.    .#                     #.    .#
+                   #    #                       #    #
+                   #    #                       #    #
+                    #  #                         #  #
+                     ##                           ##
+    </pre>
+  </div>
 
-    <div class="card">
-      <p>A small lab for useful AI products.</p>
+  <!-- Navigation -->
+  <nav>
+    <a href="/" class="nav-logo">
+      <span>🪐</span> <b><i>DARK GRAVITY LABS</i></b>
+    </a>
+    <a href="https://cal.com/drzimmermannyannik/call" class="nav-cta"><b><i>Let's Talk</i></b></a>
+  </nav>
 
-      <dl>
-        <dt>Legal business name</dt>
-        <dd><strong>Dark Gravity Labs</strong></dd>
-
-        <dt>Registered address</dt>
-        <dd>Blvd Dondukov 85<br>Sofia 1527<br>Bulgaria</dd>
-
-        <dt>Business phone</dt>
-        <dd><a href="tel:+4917692678859">+49 176 9267 8859</a></dd>
-
-        <dt>Business email</dt>
-        <dd><a href="mailto:hello@darkgravitylabs.com">hello@darkgravitylabs.com</a></dd>
-
-        <dt>VAT / UIC</dt><dd>BG208062187</dd>
-      </dl>
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>Automation for Talent Agencies</h1>
     </div>
+    <div class="hero-right">
+      <p class="hero-description">End-to-end workflow automation that scales with your agency. Automate booking, contracts, invoicing, and talent management—so you can focus on your people.</p>
+      <a href="https://cal.com/drzimmermannyannik/call" class="hero-cta"><b><i>Let's Talk</i></b></a>
+    </div>
+    <div class="hero-image">
+      <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1600&q=80" alt="Team collaboration">
+    </div>
+  </section>
 
-    <footer>
-      © 2025 Dark Gravity Labs. All rights reserved.
-    </footer>
-  </main>
+  <!-- Social Proof Section -->
+  <section class="proof">
+    <div class="proof-container">
+      <div class="proof-logos">
+        <span class="proof-logo bp">BP</span>
+        <span class="proof-logo shell">Shell</span>
+        <span class="proof-logo">NATO</span>
+        <a href="https://playstack.co" class="proof-logo" target="_blank">playstack.co</a>
+      </div>
+      <h2 class="proof-headline">We've helped generate <span class="highlight">millions</span> for B2B companies with automation and AI.</h2>
+      <div class="proof-list">
+        <div class="proof-item">
+          <span class="proof-number">1</span>
+          <span class="proof-text">Enabled $2M+ in contracts with AI/ML systems</span>
+        </div>
+        <div class="proof-item">
+          <span class="proof-number">2</span>
+          <span class="proof-text">$35K+ additional revenue with automated reporting</span>
+        </div>
+        <div class="proof-item">
+          <span class="proof-number">3</span>
+          <span class="proof-text">PhD in theoretical physics — 3 published papers, 49 citations</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section with Portrait -->
+  <section class="cta-section">
+    <div class="cta-portrait">
+      <img src="portrait.jpg" alt="Yannik">
+    </div>
+    <div class="cta-content">
+      <h2>Ready to automate?</h2>
+      <p class="cta-bio">Yannik holds a PhD in theoretical physics and has spent 15+ years building software—from physics simulations to ML pipelines for Fortune 500 companies. Now he brings that expertise to talent agencies.</p>
+      <a href="https://cal.com/drzimmermannyannik/call" class="cta-button"><b><i>Let's Talk</i></b></a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <span class="footer-info">Blvd Dondukov 85, Sofia 1527, Bulgaria · VAT: BG208062187</span>
+    <span class="footer-info">© 2025 Dark Gravity Labs</span>
+  </footer>
 </body>
 </html>

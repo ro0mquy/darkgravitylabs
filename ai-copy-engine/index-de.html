@@ -1,0 +1,929 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Copy Engine | Dark Gravity Labs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #09090b; --surface: #18181b; --surface-2: #27272a;
+    --border: #3f3f46; --text: #fafafa; --dim: #a1a1aa;
+    --accent: #34d399; --accent-dim: rgba(52,211,153,0.12);
+    --red: #fb7185; --red-dim: rgba(251,113,133,0.12);
+    --warm: #fbbf24;
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #fafafa; --surface: #ffffff; --surface-2: #f4f4f5;
+      --border: #e4e4e7; --text: #18181b; --dim: #71717a;
+      --accent: #059669; --accent-dim: rgba(5,150,105,0.08);
+      --red: #e11d48; --red-dim: rgba(225,29,72,0.06);
+      --warm: #b45309;
+    }
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+    background: var(--bg); color: var(--text);
+    line-height: 1.6; font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ASCII Background Texture */
+  .ascii-bg {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none; z-index: 0; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .ascii-bg pre {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 14px; line-height: 1.4;
+    color: rgba(52,211,153,0.15);
+    white-space: pre; text-align: center;
+  }
+  @media (prefers-color-scheme: light) {
+    .ascii-bg pre { color: rgba(5,150,105,0.10); }
+  }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 0 2.5rem; }
+
+  /* Animations */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes slideRight {
+    from { opacity: 0; transform: translateX(-30px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  .anim-up { animation: fadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) both; }
+  .anim-in { animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; }
+  .d1 { animation-delay: 0.1s; } .d2 { animation-delay: 0.2s; }
+  .d3 { animation-delay: 0.3s; } .d4 { animation-delay: 0.4s; }
+  .d5 { animation-delay: 0.5s; } .d6 { animation-delay: 0.6s; }
+
+  /* Hero — asymmetric left-aligned */
+  .hero {
+    min-height: 100dvh; display: flex; align-items: center;
+    padding: 6rem 0; position: relative; z-index: 1;
+  }
+  .hero-inner {
+    display: grid; grid-template-columns: 1.4fr 1fr; gap: 4rem;
+    align-items: center;
+  }
+  .hero-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.2em;
+    color: var(--accent); font-weight: 500; margin-bottom: 1.5rem;
+  }
+  .hero h1 {
+    font-size: clamp(2.5rem, 5vw, 3.8rem); font-weight: 800;
+    letter-spacing: -0.03em; line-height: 1.05; margin-bottom: 1.5rem;
+  }
+  .hero h1 em {
+    font-style: normal; color: var(--accent);
+    text-decoration: underline; text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+  }
+  .hero-tagline {
+    font-size: 1.1rem; color: var(--dim); max-width: 480px;
+    line-height: 1.7; font-weight: 300;
+  }
+  .hero-stats {
+    display: flex; flex-direction: column; gap: 1.2rem;
+    padding: 2rem; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 16px;
+    box-shadow: 0 20px 40px -15px rgba(0,0,0,0.15);
+  }
+  .hero-stat {
+    display: flex; align-items: baseline; gap: 0.8rem;
+  }
+  .hero-stat-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.8rem; font-weight: 600; color: var(--accent);
+    min-width: 70px;
+  }
+  .hero-stat-label {
+    font-size: 0.95rem; color: var(--dim); line-height: 1.4;
+  }
+
+  /* Sections */
+  .sec { padding: 5rem 0; position: relative; z-index: 1; }
+  .sec-divider {
+    border: none; border-top: 1px solid var(--border); margin: 0;
+  }
+  .sec-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1rem; text-transform: uppercase; letter-spacing: 0.15em;
+    color: var(--accent); font-weight: 700; margin-bottom: 0.6rem;
+  }
+  .sec-title {
+    font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 700;
+    letter-spacing: -0.02em; margin-bottom: 0.5rem;
+  }
+  .sec-sub {
+    font-size: 1rem; color: var(--dim); margin-bottom: 3rem;
+    max-width: 860px; font-weight: 300; line-height: 1.7;
+  }
+
+  /* Case study — asymmetric */
+  .case {
+    display: grid; grid-template-columns: 1fr 1.2fr; gap: 2.5rem;
+    align-items: start; margin-bottom: 4rem;
+  }
+  .case-img {
+    border-radius: 12px; border: 1px solid var(--border);
+    width: 100%; display: block;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .case-img:hover { transform: scale(1.02); }
+  .case-brief h3 {
+    font-size: 1.2rem; font-weight: 700; margin-bottom: 0.6rem;
+  }
+  .case-brief p {
+    color: var(--dim); line-height: 1.7; font-weight: 300;
+    margin-bottom: 1rem;
+  }
+  .pills { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .pill {
+    font-family: 'JetBrains Mono', monospace;
+    background: var(--surface-2); border-radius: 6px;
+    padding: 0.25rem 0.65rem; font-size: 0.75rem; font-weight: 500;
+    color: var(--text); border: 1px solid var(--border);
+    transition: border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .pill:hover { border-color: var(--accent); }
+
+  /* Competitor grid — 2+2 asymmetric */
+  .comp-grid {
+    display: grid; grid-template-columns: 1.3fr 1fr; gap: 1rem;
+    margin-bottom: 1rem;
+  }
+  .comp-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; overflow: hidden;
+    transition: border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+                transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .comp-card:hover {
+    border-color: var(--accent);
+    transform: translateY(-2px);
+  }
+  .comp-card img {
+    width: 100%; display: block;
+    border-bottom: 1px solid var(--border);
+  }
+  .comp-body { padding: 1rem; }
+  .comp-name { font-weight: 700; font-size: 1rem; margin-bottom: 0.3rem; }
+  .comp-stat {
+    font-size: 1rem; color: var(--dim); line-height: 1.6; font-weight: 300;
+  }
+  .comp-stat strong { color: var(--text); font-weight: 600; }
+  .comp-more {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 1.2rem;
+  }
+  .comp-more-title {
+    font-size: 0.85rem; font-weight: 600; margin-bottom: 0.6rem;
+    color: var(--dim);
+  }
+  .comp-more-item {
+    font-size: 1rem; color: var(--dim); padding: 0.3rem 0;
+    border-bottom: 1px solid var(--border); font-weight: 300;
+  }
+  .comp-more-item:last-child { border-bottom: none; }
+  .comp-more-item strong { color: var(--text); font-weight: 500; }
+  .caption {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem; color: var(--dim); margin-top: 0.8rem;
+    margin-bottom: 4rem; padding: 0.6rem 0;
+    border-top: 1px solid var(--border); letter-spacing: 0.02em;
+  }
+
+  /* Ad creatives — 3-col masonry with explicit columns */
+  .ad-masonry {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;
+    align-items: start; margin-bottom: 4rem;
+  }
+  .ad-col { display: flex; flex-direction: column; gap: 1rem; }
+  .ad-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; overflow: hidden;
+    transition: border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .ad-card:hover { border-color: var(--accent); }
+  .ad-card img { width: 100%; display: block; }
+  .ad-card-label {
+    padding: 0.5rem 0.7rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem; color: var(--dim); letter-spacing: 0.02em;
+  }
+
+  /* Quotes */
+  .quotes { display: flex; flex-direction: column; gap: 0.6rem; margin-bottom: 4rem; }
+  .quote {
+    background: var(--surface);
+    border-left: 2px solid var(--accent);
+    border-radius: 0 12px 12px 0;
+    padding: 1rem 1.2rem;
+    transition: border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+                background 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .quote:hover { background: var(--surface-2); }
+  .quote-text {
+    font-size: 1rem; font-weight: 500; color: var(--accent);
+    font-style: italic;
+  }
+  .quote-context {
+    font-size: 0.85rem; color: var(--dim); font-weight: 300;
+    margin-top: 0.2rem;
+  }
+  .quote-src {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem; color: var(--dim); margin-top: 0.4rem;
+    text-transform: uppercase; letter-spacing: 0.06em;
+  }
+
+  /* Insights — no card boxing, just border-t separation */
+  .insights { margin-bottom: 3rem; }
+  .insight {
+    padding: 1rem 0; border-top: 1px solid var(--border);
+    display: grid; grid-template-columns: 140px 1fr; gap: 1.5rem;
+    align-items: start;
+  }
+  .insight:last-child { border-bottom: 1px solid var(--border); }
+  .insight-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em;
+    color: var(--warm); font-weight: 600; padding-top: 0.15rem;
+  }
+  .insight-text { font-size: 1rem; line-height: 1.7; font-weight: 300; }
+  .insight-text strong { color: var(--warm); font-weight: 600; }
+
+  /* IO Grid */
+  .io-grid {
+    display: grid; grid-template-columns: 1fr 1.3fr; gap: 0;
+    margin-bottom: 3rem; border: 1px solid var(--border); border-radius: 16px;
+    overflow: hidden;
+  }
+  .io-col { padding: 1.5rem; }
+  .io-col:first-child {
+    background: var(--surface); border-right: 1px solid var(--border);
+  }
+  .io-col:last-child { background: var(--bg); }
+  .io-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.12em;
+    color: var(--dim); font-weight: 500; margin-bottom: 1rem;
+  }
+  .io-group { margin-bottom: 1.2rem; }
+  .io-group:last-child { margin-bottom: 0; }
+  .io-group-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em;
+    font-weight: 500; margin-bottom: 0.6rem;
+    padding-left: 0.6rem; border-left: 2px solid;
+  }
+  .io-group-title.io-brand { color: var(--accent); border-color: var(--accent); }
+  .io-group-title.io-market { color: var(--dim); border-color: var(--dim); }
+  .io-pills {
+    display: flex; flex-wrap: wrap; gap: 0.4rem;
+  }
+  .io-pill {
+    font-size: 0.75rem; padding: 0.3rem 0.7rem;
+    border-radius: 100px; font-weight: 300;
+  }
+  .io-pill.pill-brand {
+    background: var(--accent-dim); border: 1px solid var(--accent);
+    color: var(--accent); font-weight: 400;
+  }
+  .io-pill.pill-market {
+    background: var(--surface-2); border: 1px solid var(--border);
+    color: var(--dim);
+  }
+  .io-pill.pill-market .pill-num {
+    color: var(--text); font-weight: 400;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;
+  }
+  .io-output { font-size: 0.95rem; line-height: 1.9; }
+
+  /* Comparison */
+  .compare {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+    margin-bottom: 1.5rem; border-radius: 16px; overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .compare-col { padding: 1.5rem; }
+  .compare-bad {
+    background: var(--red-dim); border-right: 1px solid var(--border);
+  }
+  .compare-good { background: var(--accent-dim); }
+  .compare-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.12em;
+    font-weight: 600; margin-bottom: 1rem;
+  }
+  .compare-bad .compare-label { color: var(--red); }
+  .compare-good .compare-label { color: var(--accent); }
+  .compare-text { font-size: 1rem; line-height: 1.9; color: var(--dim); font-weight: 300; }
+  .compare-good .compare-text { color: var(--text); font-weight: 400; }
+  .compare-callout {
+    border: 1px solid var(--accent);
+    border-radius: 12px; padding: 1.2rem 1.5rem;
+    font-size: 1rem; color: var(--text); text-align: center;
+    margin-bottom: 4rem; font-weight: 300;
+    background: var(--accent-dim);
+  }
+  .compare-callout strong {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--accent); font-weight: 600; font-size: 0.85rem;
+  }
+  .samples-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+    margin-bottom: 3rem;
+  }
+  .sample-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 1.5rem;
+    transition: border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .sample-card:hover { border-color: var(--accent); }
+  .sample-card.sample-wide {
+    grid-column: 1 / -1;
+  }
+  .sample-format {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--accent); font-weight: 500; margin-bottom: 0.8rem;
+  }
+  .sample-text {
+    font-size: 0.9rem; color: var(--text); line-height: 1.8;
+    font-weight: 300;
+  }
+  .sample-text strong { font-weight: 600; }
+  .sample-text .highlight { color: var(--accent); font-weight: 500; }
+  .sample-note {
+    font-size: 0.75rem; color: var(--dim); margin-top: 0.8rem;
+    font-style: italic;
+  }
+
+  /* Steps — 2-col asymmetric, not 3 equal */
+  .steps-grid {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;
+    margin-bottom: 4rem;
+  }
+  .step {
+    padding: 1.5rem; border-top: 2px solid var(--border);
+    transition: border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .step:hover { border-top-color: var(--accent); }
+  .step-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.5rem; font-weight: 700; color: var(--accent);
+    margin-bottom: 0.5rem;
+  }
+  .step-title {
+    font-size: 1rem; font-weight: 700; letter-spacing: -0.01em;
+    margin-bottom: 0.4rem;
+  }
+  .step-desc { font-size: 1rem; color: var(--dim); line-height: 1.7; font-weight: 300; }
+
+  /* Audience — no card, just type */
+  .audience-list { margin-bottom: 1.5rem; }
+  .audience-item {
+    font-size: 1rem; padding: 0.7rem 0;
+    border-bottom: 1px solid var(--border); font-weight: 300;
+  }
+  .audience-item:first-child { border-top: 1px solid var(--border); }
+  .audience-item::before {
+    content: '\2192'; color: var(--accent); margin-right: 0.8rem;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .audience-anti {
+    font-size: 0.95rem; color: var(--dim); font-style: italic;
+    margin-top: 1rem; font-weight: 300;
+  }
+
+  /* CTA */
+  .cta-section { padding: 5rem 0; position: relative; z-index: 1; }
+  .cta-inner {
+    text-align: center; max-width: 520px; margin: 0 auto;
+  }
+  .cta-portrait {
+    width: 140px; height: 140px; border-radius: 50%;
+    overflow: hidden; margin: 0 auto 2rem;
+    border: 1px solid var(--border);
+  }
+  .cta-portrait img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .cta-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--dim); margin-bottom: 2rem;
+  }
+  .cta-inner .sec-label { margin-bottom: 0.8rem; }
+  .cta-title {
+    font-size: clamp(1.5rem, 3vw, 2.2rem); font-weight: 700;
+    letter-spacing: -0.02em; margin-bottom: 0.8rem; line-height: 1.15;
+  }
+  .cta-desc {
+    font-size: 1rem; color: var(--dim); line-height: 1.7;
+    font-weight: 300; margin-bottom: 2rem;
+  }
+  .cta-btn {
+    display: inline-block; padding: 0.9rem 2.5rem;
+    background: var(--accent); color: var(--bg);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.15em;
+    text-decoration: none; border-radius: 8px;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 4px 20px rgba(52,211,153,0.2);
+  }
+  .cta-btn:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 30px rgba(52,211,153,0.3);
+  }
+  .cta-btn:active {
+    transform: translateY(0) scale(0.98);
+  }
+
+  /* Footer */
+  .foot {
+    border-top: 1px solid var(--border); padding: 3rem 0;
+    display: flex; justify-content: space-between; align-items: baseline;
+    position: relative; z-index: 1;
+  }
+  .foot-brand {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.15em;
+    color: var(--accent); font-weight: 500;
+  }
+  .foot-url { font-size: 0.85rem; color: var(--dim); font-weight: 300; text-decoration: none; }
+  .foot-url:hover { color: var(--accent); }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .wrap { padding: 0 1.2rem; }
+    .hero { padding: 4rem 0; }
+    .hero-inner { grid-template-columns: 1fr; gap: 2rem; }
+    .case { grid-template-columns: 1fr; }
+    .comp-grid { grid-template-columns: 1fr; }
+    .ad-masonry { grid-template-columns: 1fr; }
+    .io-grid { grid-template-columns: 1fr; }
+    .io-col:first-child { border-right: none; border-bottom: 1px solid var(--border); }
+    .compare { grid-template-columns: 1fr; }
+    .samples-grid { grid-template-columns: 1fr; }
+    .compare-bad { border-right: none; border-bottom: 1px solid var(--border); }
+    .steps-grid { grid-template-columns: 1fr; }
+    .step:last-child { grid-column: auto; }
+    .foot { flex-direction: column; gap: 0.5rem; }
+    .insight { grid-template-columns: 1fr; gap: 0.3rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ASCII Background Texture -->
+<div class="ascii-bg">
+  <pre>
+                                      +*%#.        .*#%*+
+                                 =#%*.    -+##+-      .*%#=
+                              +%#-      +#*.  .*#+      -#%+
+                           =%#-       +#*        *#+       -%#=
+                        .#%-        =#*          *#=        -%#.
+                      +%+         -%#-            -#%-         +%+
+                    =%+          +%+                +%+          +%=
+                  -%+          .%#.    .+#####+.    .#%.          +%-
+                .%#.          -%#.   +#%*-  -*%#+   .#%-          .#%.
+               +%-           =%#.  =%#-        -#%=  .#%=           -%+
+             .%#            =#%. .#%-            -%#. .%#=            #%.
+            =%=            +%+  -%#                #%-  +%+            =%=
+           #%            .%#. +%+                  +%+ .#%.            %#
+         .%#            -%#. =%=      +#####+      =%=  #%-            #%.
+        -%+            =%#  +%-     =%*.   .*%=     -%+ .#%=            +%-
+       +%-            +%+ .%#     -%#.       .#%-    #%. +%+            -%+
+      #%.            #%- -%+    .%#.           #%.   +%- -%#            .%#
+     %#            .%#. +%-    +%-      .      -%+   -%+  #%.            #%
+    %#            -%#  +%=   .%#     -+#%#+.    #%.   =%+ .#%-            #%
+   %#            =%#  +%-   -%+    =%*. .*%=   +%-   -%+  #%=            #%
+  ##            +%+  #%.   +%=   -%#.     .#%- =%+   .%#  +%+            ##
+ ##            #%-  #%-   #%.  .%#    =#=   #%. %#   -%#  -%#            ##
+.#           -%#  .%#   =%=   +%-   =%#%=  -%+ =%=   #%.  #%-           #.
+#.          =%#   #%.  +%-   #%.  -%#. #%- +%=  -%+ .%#   #%=          .#
+#          +%+   %#   #%.  =%=  +%+    +%+ %#   .%# #%   +%+          #
+#         #%-  .%#  .%#  +%-  #%-      -%##%.    #%#%.  -%#         #
+#        #%   -%#   #%  #%.  %#         +%+      +%+   #%   #%        #
+#       %#   =%#   %#  %#  .%+                        +%.  #%   #%       #
+#      ##   +%+   ##  ##  +%                          %+  ##   +%+   ##      #
+#     .#   #%-   .#  .#  #%                          %#  #.   -%#   #.     #
+#     #   #%     #  #  %#                          #%  #  #     %#   #     #
+#    #   %#     #  #  ##                          ##  #  #     #%   #    #
+#    #  ##     #  #  #.                          .#  #  #     ##  #    #
+ #  #  #.     #  #  #                            #  #  #     .#  #  #
+  ##  #      # .#  #                            #  #. #      #  ##
+     #      # .#  #              ..              #  #. #      #
+           #  #  #           .+#%%#+.           #  #  #
+          #  #  #          =%#=   =#%=          #  #  #
+         #  #  #         +%+         +%+         #  #  #
+        .  #  #.        #%             %#        .#  #  .
+           #  #        %#               #%        #  #
+           #  #       ##                 ##       #  #
+              #.     .#                   #.     .#
+              #      #                     #      #
+              #.    .#                     #.    .#
+               #    #                       #    #
+               #    #                       #    #
+                #  #                         #  #
+                 ##                           ##
+  </pre>
+</div>
+
+<section class="hero">
+<div class="wrap">
+  <div class="hero-inner">
+    <div>
+      <div class="hero-eyebrow anim-up">Dark Gravity Labs</div>
+      <h1 class="anim-up d1">KI-Copy wie von<br><em>deinem besten Texter.</em></h1>
+      <p class="hero-tagline anim-up d2">Das Copywriting-System f&uuml;r Agenturen, die f&uuml;r ihre Kunden schreiben. Wir durchleuchten den Markt: Wettbewerber, Ads, Bewertungen, Foren, Video-Transkripte. Und liefern Copy, trainiert auf der Arbeit deiner besten Copywriter. Nicht Slop aus der Prompt-Lotterie.</p>
+      <p class="hero-tagline anim-up d2" style="margin-top: 0.8rem; color: var(--text); font-weight: 400;">Doppelt so viele Kunden. Null neue Mitarbeiter.</p>
+    </div>
+    <div class="hero-stats anim-up d3">
+      <div class="hero-stat">
+        <span class="hero-stat-num">82</span>
+        <span class="hero-stat-label">Wettbewerber-Ads analysiert</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-num">13</span>
+        <span class="hero-stat-label">YouTube-Transkripte ausgewertet</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-num">7</span>
+        <span class="hero-stat-label">Wettbewerber-Websites erfasst</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-num">1</span>
+        <span class="hero-stat-label">echte Fallstudie</span>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<hr class="sec-divider">
+
+<section class="sec">
+<div class="wrap">
+  <div class="sec-label">Phase 01: Research</div>
+  <div class="sec-title">Zuerst verstehen wir den Markt deines Kunden</div>
+  <p class="sec-sub">Bevor wir ein Wort schreiben, durchleuchten wir die Nische deines Kunden. Hier ein echtes Beispiel: unbearbeiteter Research-Output f&uuml;r ein deutsches Versicherungsportal.</p>
+
+  <div class="case">
+    <img class="case-img" src="screenshots/checkfox-zahnzusatz.png" alt="Checkfox.de Zahnzusatzversicherung">
+    <div class="case-brief">
+      <div class="sec-label">Fallstudie</div>
+      <h3>Checkfox.de</h3>
+      <p>Versicherungs-Vergleichsportal aus Kulmbach, Deutschland. Spezialisiert auf Zahnzusatzversicherung und private Krankenversicherung.</p>
+      <div class="pills">
+        <span class="pill">1.3M+ Kunden</span>
+        <span class="pill">1M+ Vertr&auml;ge</span>
+        <span class="pill">50+ Inbound-Calls/Tag</span>
+        <span class="pill">Zahnzusatzversicherung</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-label">Wettbewerbslandschaft</div>
+  <p class="sec-sub">Wettbewerber-Websites, Trustpilot-Profile und die komplette Facebook Ad Library. Systematisch erfasst.</p>
+
+  <div class="comp-grid">
+    <div class="comp-card">
+      <img src="screenshots/check24.png" alt="Check24 Zahnzusatzversicherung">
+      <div class="comp-body">
+        <div class="comp-name">Check24</div>
+        <div class="comp-stat">
+          <strong>350K</strong> Trustpilot-Bewertungen &middot; <strong>4.8/5</strong> &middot; Marktf&uuml;hrer (87% der Portal-Nutzer).<br>
+          Null aktive Facebook-Ads f&uuml;r Zahnzusatz. Setzt komplett auf SEO und Google Ads.
+        </div>
+      </div>
+    </div>
+    <div class="comp-card">
+      <img src="screenshots/dentolo.png" alt="dentolo">
+      <div class="comp-body">
+        <div class="comp-name">dentolo</div>
+        <div class="comp-stat">
+          <strong>25</strong> aktive Facebook-Ads (gr&ouml;&szlig;ter Werbetreibender) &middot; <strong>9.5K</strong> Bewertungen, <strong>4.2/5</strong>.<br>
+          Erstattungsverz&ouml;gerungen seit Ende 2025. Aufkommende Wettbewerbsschw&auml;che.
+        </div>
+      </div>
+    </div>
+    <div class="comp-card">
+      <img src="screenshots/clark.png" alt="Clark">
+      <div class="comp-body">
+        <div class="comp-name">Clark</div>
+        <div class="comp-stat">
+          <strong>700K+</strong> Kunden &middot; App-first, algorithmusgetrieben &middot; <strong>4.4/5</strong> Trustpilot.<br>
+          Informeller Ton, Lifestyle-Framing. PKV-Fokus.
+        </div>
+      </div>
+    </div>
+    <div class="comp-more">
+      <div class="comp-more-title">+ 4 weitere analysiert</div>
+      <div class="comp-more-item"><strong>Verivox</strong> &mdash; 54K reviews, 4.8/5. Starke Nr. 2 im Energiemarkt, zunehmend auch in Versicherungen.</div>
+      <div class="comp-more-item"><strong>Finanztip</strong> &mdash; Gemeinn&uuml;tzig, rechnet alles durch. 169K Views auf dem Zahnzusatz-Video.</div>
+      <div class="comp-more-item"><strong>Tarifcheck</strong> &mdash; Lead-Gen &uuml;ber Check24/Mr-Money. Seit 2001.</div>
+      <div class="comp-more-item"><strong>Clevox</strong> &mdash; 33 Page Likes, f&auml;hrt seit einem Jahr Ads f&uuml;r ERGO. Klein, aber profitabel.</div>
+    </div>
+  </div>
+
+  <div class="caption">82 Facebook-Ads von 27 Werbetreibenden &middot; 5 Trustpilot-Profile &middot; 153 Google-Maps-Bewertungen &middot; 7 Wettbewerber-Websites</div>
+
+  <div class="sec-label">Erfasste Ad Creatives</div>
+  <p class="sec-sub">Echte Facebook-Ads aus diesem Markt, heruntergeladen und analysiert. Acht Ads von sechs verschiedenen Werbetreibenden: vom emotionalen Appell &uuml;ber Preisarbitrage bis zum Wettbewerbsangriff.</p>
+
+  <div class="ad-masonry">
+    <div class="ad-col">
+      <div class="ad-card">
+        <img src="screenshots/dentolo.jpg" alt="dentolo / Cartoon-Illustration">
+        <div class="ad-card-label">dentolo &mdash; Emotion + Testsieger-Siegel</div>
+      </div>
+      <div class="ad-card">
+        <img src="screenshots/zahnschutzvergleich-2.jpg" alt="Zahnschutzvergleich / &Auml;ltere Frau">
+        <div class="ad-card-label">Zahnschutzvergleich &mdash; Zielgruppe 45+</div>
+      </div>
+    </div>
+    <div class="ad-col">
+      <div class="ad-card">
+        <img src="screenshots/clevox.png" alt="Clevox / ERGO vs dentolo Vergleich">
+        <div class="ad-card-label">Clevox &mdash; Direkter Wettbewerbsangriff</div>
+      </div>
+      <div class="ad-card">
+        <img src="screenshots/muenchener-verein.jpg" alt="M&uuml;nchener Verein &mdash; Kind lacht">
+        <div class="ad-card-label">M&uuml;nchener Verein &mdash; Kinder-Zahnzusatz</div>
+      </div>
+      <div class="ad-card">
+        <img src="screenshots/zahnschutzvergleich.jpg" alt="Zahnschutzvergleich / Implantat 3D">
+        <div class="ad-card-label">Zahnschutzvergleich &mdash; 3D-Rendering</div>
+      </div>
+      <div class="ad-card">
+        <img src="screenshots/ergo-kildau.jpg" alt="ERGO Kildau &mdash; Paar mit Zahnb&uuml;rste">
+        <div class="ad-card-label">ERGO Kildau &mdash; Lokaler Makler</div>
+      </div>
+    </div>
+    <div class="ad-col">
+      <div class="ad-card">
+        <img src="screenshots/clark.jpg" alt="Clark &mdash; GKV vs PKV Preisvergleich">
+        <div class="ad-card-label">Clark &mdash; Preisarbitrage GKV vs PKV</div>
+      </div>
+      <div class="ad-card">
+        <img src="screenshots/dentolo-oralb.jpg" alt="dentolo x Oral-B &mdash; Produktfoto">
+        <div class="ad-card-label">dentolo x Oral-B &mdash; Co-Branding</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-label">Stimme des Marktes</div>
+  <p class="sec-sub">Echte Sprache aus YouTube, Reddit und Foren. So reden Kunden, wenn keiner zuh&ouml;rt.</p>
+
+  <div class="quotes">
+    <div class="quote">
+      <div class="quote-text">&bdquo;Tarifdschungel&ldquo;</div>
+      <div class="quote-context">Von jedem einzelnen Content Creator verwendet. Der universelle Schmerzpunkt.</div>
+      <div class="quote-src">13 YouTube-Videos, Foren, Wettbewerber-Copy</div>
+    </div>
+    <div class="quote">
+      <div class="quote-text">&bdquo;&Uuml;ber 200 Zahnzusatzversicherungen. Wer soll da durchblicken?&ldquo;</div>
+      <div class="quote-src">YouTube / Zahnzusatzversicherung Vergleich</div>
+    </div>
+    <div class="quote">
+      <div class="quote-text">&bdquo;Sofort versichert hei&szlig;t nicht sofort bezahlt.&ldquo;</div>
+      <div class="quote-context">Versteckte Fallen bei Wartezeiten.</div>
+      <div class="quote-src">Finanztip (109K Views)</div>
+    </div>
+    <div class="quote">
+      <div class="quote-text">&bdquo;Lohnt sich das?&ldquo;</div>
+      <div class="quote-context">Die zentrale Frage in jedem einzelnen Video.</div>
+      <div class="quote-src">Universal &uuml;ber alle YouTube-Kan&auml;le</div>
+    </div>
+    <div class="quote">
+      <div class="quote-text">&bdquo;Die Patienten, die bei uns am besten versichert sind, sind gesetzlich Versicherte mit einer guten Zahnzusatzversicherung.&ldquo;</div>
+      <div class="quote-context">Eine praktizierende Zahn&auml;rztin. Genau das verkauft Checkfox.</div>
+      <div class="quote-src">FELGNER Zahnerhaltung (Zahn&auml;rztin, YouTube)</div>
+    </div>
+  </div>
+
+  <div class="sec-label">Psychologie des Marktes</div>
+  <p class="sec-sub">Was die Research &uuml;ber die Entscheidungspsychologie der Zielgruppe verr&auml;t.</p>
+
+  <div class="insights">
+    <div class="insight">
+      <div class="insight-num">Limbischer Typ</div>
+      <div class="insight-text"><strong>Prim&auml;r GR&Uuml;N (Sicherheit, N&auml;he, Vertrauen), sekund&auml;r BLAU (Logik, Struktur).</strong> Die Zielgruppe kauft nicht &uuml;ber Status oder Dringlichkeit. Sie braucht das Gef&uuml;hl, ehrlich beraten zu werden. Jeder Verkaufsdruck ist ein Conversion-Killer.</div>
+    </div>
+    <div class="insight">
+      <div class="insight-num">Buying Conviction</div>
+      <div class="insight-text"><strong>&bdquo;Ich will mich nicht &uuml;ber den Tisch ziehen lassen.&ldquo;</strong> Misstrauen gegen&uuml;ber Versicherungen ist der st&auml;rkste Einwand. Die Copy muss Transparenz beweisen, nicht behaupten. Konkret: schriftliche Zusage vor Behandlung, Widerrufsrecht, kein Kleingedrucktes.</div>
+    </div>
+    <div class="insight">
+      <div class="insight-num">Entscheidungsrahmen</div>
+      <div class="insight-text"><strong>Die Entscheidung wird nicht rational getroffen, sondern aufgeschoben.</strong> Der innere Dialog ist nicht &bdquo;brauche ich das?&ldquo; sondern &bdquo;ich k&uuml;mmere mich n&auml;chsten Monat.&ldquo; Die Copy muss das Aufschieben adressieren, nicht das Produkt erkl&auml;ren.</div>
+    </div>
+    <div class="insight">
+      <div class="insight-num">Sprachmuster</div>
+      <div class="insight-text"><strong>&bdquo;Tarifdschungel&ldquo; ist das universelle Frame.</strong> 13 YouTube-Creator, jedes Forum, jeder Vergleichsartikel. Der Markt hat sich selbst ein Wort gegeben. Copy, die dieses Wort aufgreift, aktiviert sofort Wiedererkennung.</div>
+    </div>
+    <div class="insight">
+      <div class="insight-num">Geheimer Wunsch</div>
+      <div class="insight-text"><strong>&bdquo;Einfach zum Zahnarzt gehen, ohne vorher den Kontostand zu pr&uuml;fen.&ldquo;</strong> Nicht Geld sparen. Nicht den besten Tarif finden. Sondern Ruhe im Kopf. Die Transformation ist emotional, nicht finanziell. Deshalb funktioniert &bdquo;Dann machen wir das&ldquo; als Closer.</div>
+    </div>
+  </div>
+
+</div>
+</section>
+
+<hr class="sec-divider">
+
+<section class="sec">
+<div class="wrap">
+  <div class="sec-label">Phase 02: Copy</div>
+  <div class="sec-title">Dann schreibt das System wie dein bester Copywriter</div>
+  <p class="sec-sub">Aus Market Research und Brand DNA wird Copy. Das System lernt die Stimme, den Ton und die Sprache jedes Kunden. Kein KI-Deutsch.</p>
+
+  <div class="io-grid">
+    <div class="io-col">
+      <div class="io-label">Was reingeht</div>
+      <div class="io-group">
+        <div class="io-group-title io-brand">Brand DNA</div>
+        <div class="io-pills">
+          <span class="io-pill pill-brand">Bestehende Copy + Referenztexte</span>
+          <span class="io-pill pill-brand">Tonalit&auml;t + Stilrichtlinien</span>
+          <span class="io-pill pill-brand">Psychologie-Frameworks</span>
+          <span class="io-pill pill-brand">Wording-Regeln</span>
+          <span class="io-pill pill-brand">Top-performing Copy aus vergangenen Kampagnen</span>
+        </div>
+      </div>
+      <div class="io-group">
+        <div class="io-group-title io-market">Market Intelligence</div>
+        <div class="io-pills">
+          <span class="io-pill pill-market"><span class="pill-num">7</span> Wettbewerber-Websites</span>
+          <span class="io-pill pill-market"><span class="pill-num">82</span> Facebook-Ads</span>
+          <span class="io-pill pill-market"><span class="pill-num">13</span> YouTube-Transkripte</span>
+          <span class="io-pill pill-market"><span class="pill-num">153</span> Google-Maps-Bewertungen</span>
+          <span class="io-pill pill-market"><span class="pill-num">5</span> Trustpilot-Profile</span>
+          <span class="io-pill pill-market">Reddit + gutefrage.net</span>
+          <span class="io-pill pill-market">TikTok + Instagram</span>
+        </div>
+      </div>
+    </div>
+    <div class="io-col">
+      <div class="io-label">Was rauskommt</div>
+      <div class="io-output">
+        <p style="color: var(--accent); font-weight: 600; margin-bottom: 0.6rem;" class="mono">VSL Script / Hook</p>
+        <p>Du sitzt beim Zahnarzt. Routine-Kontrolle. Er schaut rein, diktiert seiner Assistentin irgendwas. <em>&bdquo;B2, distal, insuffizient.&ldquo;</em> Du verstehst kein Wort. Und dann sagt er diesen einen Satz: <strong>&bdquo;Da m&uuml;ssten wir mal was machen.&ldquo;</strong></p>
+        <p style="margin-top: 0.6rem;">Erster Gedanke: Bohren. Bet&auml;ubung. Dieses Ger&auml;usch. Du sp&uuml;rst es schon, bevor irgendwas passiert ist.</p>
+        <p style="margin-top: 0.6rem;">Und dann ist da dieser Moment abends beim Z&auml;hneputzen. Deine Zunge wandert wieder zu der Stelle. Wie von selbst. Du wei&szlig;t, da wartet was auf dich. Und du schiebst es weg. Nicht weil du keine Zeit hast. <strong>Weil du nicht wissen willst, was es kostet.</strong></p>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-label" style="margin-top: 2rem;">Der Unterschied</div>
+  <p class="sec-sub">Gleiches Briefing: &bdquo;Schreib eine Facebook-Ad f&uuml;r ein Zahnzusatz-Vergleichsportal.&ldquo;</p>
+
+  <div class="compare">
+    <div class="compare-col compare-bad">
+      <div class="compare-label">Generischer KI-Output</div>
+      <div class="compare-text">
+        <p>Sie suchen eine Zahnzusatzversicherung? Vergleichen Sie jetzt Tarife f&uuml;hrender Anbieter und finden Sie den optimalen Schutz.</p>
+        <p style="margin-top: 0.6rem;">Mit unserem umfassenden Vergleichsrechner finden Sie g&uuml;nstige Zahnzusatzversicherungen &mdash; schnell und unkompliziert.</p>
+        <p style="margin-top: 0.6rem;">Warten Sie nicht, bis es zu sp&auml;t ist &mdash; sch&uuml;tzen Sie Ihr L&auml;cheln noch heute!</p>
+        <p style="margin-top: 0.6rem;">Jetzt kostenlos vergleichen &rarr;</p>
+      </div>
+    </div>
+    <div class="compare-col compare-good">
+      <div class="compare-label">Brand DNA + Research</div>
+      <div class="compare-text">
+        <p>&Uuml;ber 200 Tarife. 90 davon &bdquo;sehr gut.&ldquo;</p>
+        <p style="margin-top: 0.6rem;"><strong>Wer soll da durchblicken?</strong></p>
+        <p style="margin-top: 0.6rem;">Du brauchst keinen weiteren Vergleichsrechner, der dir 47 Optionen anzeigt und dich dann allein l&auml;sst.</p>
+        <p style="margin-top: 0.6rem;">Du brauchst jemanden, der den Tarifdschungel f&uuml;r dich lichtet. Am Telefon, pers&ouml;nlich, in 10 Minuten.</p>
+        <p style="margin-top: 0.6rem;">Keine Gesundheitsfragen. Kein Maklermandat-Trick. Keine b&ouml;se &Uuml;berraschung.</p>
+        <p style="margin-top: 0.6rem;">Jetzt Beratung sichern &rarr;</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="compare-callout">
+    Gleiches Briefing. Gleiche Zielgruppe.<br>
+    Der Unterschied: <strong>Brand DNA Training</strong>, <strong>82 analysierte Wettbewerber-Ads</strong>, <strong>13 YouTube-Transkripte</strong> und die echte Sprache des Marktes.
+  </div>
+
+  <div class="sec-label" style="margin-top: 2rem;">Mehr Output-Beispiele</div>
+  <p class="sec-sub">Verschiedene Formate, ein System. Alles aus demselben Research- und Brand-DNA-Datensatz generiert.</p>
+
+  <div class="samples-grid">
+    <div class="sample-card">
+      <div class="sample-format">Entscheidung</div>
+      <div class="sample-text">
+        <p>Du kannst weitermachen wie bisher. Hoffen, dass nichts Gr&ouml;&szlig;eres kommt. Und wenn doch, zahlst du eben 3.000 oder 4.000 Euro auf einen Schlag.</p>
+        <p style="margin-top: 0.5rem;">Aber mal ehrlich: Wie viele &auml;ltere Leute kennst du, die nie etwas an den Z&auml;hnen hatten? Denk an deine Eltern. An deine Gro&szlig;eltern. <strong>Irgendwann kommt es bei jedem.</strong></p>
+        <p style="margin-top: 0.5rem;">Der Zahnarzt sagt &bdquo;Da m&uuml;ssten wir was machen&ldquo;, und du sagst <strong>&bdquo;Dann machen wir das.&ldquo;</strong> Ohne Z&ouml;gern. Ohne Rechnen.</p>
+      </div>
+      <div class="sample-note">VSL Script, emotionaler Abschluss</div>
+    </div>
+    <div class="sample-card">
+      <div class="sample-format">Zahlenl&uuml;cke</div>
+      <div class="sample-text">
+        <p>Die gesetzliche Krankenversicherung zahlt die sogenannte Regelversorgung. Das hei&szlig;t: das Minimum. Gerade genug, damit deine Z&auml;hne funktionieren. In Schulnoten w&auml;re das eine 4. Ausreichend. <strong>Aber wer will ausreichend?</strong></p>
+        <p style="margin-top: 0.5rem;">Hier ein Heil- und Kostenplan von letzter Woche: Zahnimplantat, 3.500 Euro. Kassenanteil: 230 Euro. Eigenanteil: 3.270 Euro.</p>
+        <p style="margin-top: 0.5rem;">Das sind keine Sch&auml;tzungen. <strong>Das sind echte Rechnungen, die mir Kunden jede Woche vorlegen.</strong></p>
+      </div>
+      <div class="sample-note">VSL Script, rationale Problemdarstellung</div>
+    </div>
+    <div class="sample-card sample-wide">
+      <div class="sample-format">Beweis</div>
+      <div class="sample-text">
+        <p>Eine Frau hat sich bei uns gemeldet. Anfang 50, mehrere Z&auml;hne fehlten schon. Sie und ihr Mann hatten sogar Fl&uuml;ge nach Bulgarien gegoogelt, weil sie den Kosten in Deutschland nicht mehr getraut haben.</p>
+        <p style="margin-top: 0.5rem;">Sie hat gesagt: <strong>&bdquo;Mit meinen Z&auml;hnen nimmt mich eh keiner mehr.&ldquo;</strong></p>
+        <p style="margin-top: 0.5rem;">Wir haben gepr&uuml;ft. Kein Risikozuschlag. Keine Ablehnung. 52 Euro im Monat. Voller Schutz, sofort. Sie hat den Antrag gemacht. Und dann hat sie etwas getan, das sie seit zwei Jahren aufgeschoben hatte: Sie hat beim Zahnarzt angerufen. Am selben Tag.</p>
+      </div>
+      <div class="sample-note">VSL Script, echte Kundengeschichte</div>
+    </div>
+  </div>
+
+</div>
+</section>
+
+<hr class="sec-divider">
+
+<section class="sec">
+<div class="wrap">
+  <div class="sec-label">Der Prozess</div>
+  <div class="sec-title">So funktioniert es</div>
+  <p class="sec-sub">Drei Phasen. Von null Marktverst&auml;ndnis zu fertiger Copy.</p>
+
+  <div class="steps-grid">
+    <div class="step">
+      <div class="step-num">01</div>
+      <div class="step-title">Scrapen</div>
+      <div class="step-desc">Wettbewerber-Websites. Facebook Ad Library. Trustpilot. Google Maps. YouTube-Transkripte. TikTok. Reddit. Foren. Automatisiert via Firecrawl + Apify.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <div class="step-title">Analysieren</div>
+      <div class="step-desc">Sprachmuster aus dem Markt. Entscheidungsmuster. Vertrauenssignale. Wettbewerbsl&uuml;cken. Copy-Muster aus Dutzenden Ads. Die Research, die deine Wettbewerber &uuml;berspringen.</div>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <div class="step-title">Produzieren</div>
+      <div class="step-desc">Ads, Sales Scripts, E-Mail-Sequenzen. Trainiert auf die Brand DNA deines Kunden, geschrieben mit den Worten seines Marktes.</div>
+    </div>
+  </div>
+
+  <hr class="sec-divider" style="margin-bottom: 4rem;">
+
+  <div class="sec-label">Ideale Zielgruppe</div>
+  <div class="sec-title">Mit wem wir arbeiten</div>
+  <p class="sec-sub">F&uuml;r Agenturen, die f&uuml;r mehrere Kunden schreiben und bei keinem die Qualit&auml;t opfern wollen.</p>
+
+  <div class="audience-list">
+    <div class="audience-item">Agenturen, die f&uuml;r 5+ Marken gleichzeitig texten</div>
+    <div class="audience-item">Agenturen, die keine Lust mehr haben, Freelancer zu briefen, die den Ton nie treffen</div>
+    <div class="audience-item">Teams, die fundierte Copy brauchen, nicht Copy aus der Prompt-Lotterie</div>
+  </div>
+  <div class="audience-anti">Nicht f&uuml;r Agenturen, die glauben, ein Briefing in ChatGPT werfen z&auml;hlt als Leistung.</div>
+
+</div>
+</section>
+
+<section class="cta-section">
+<div class="wrap">
+  <div class="cta-inner">
+    <div class="cta-portrait"><img src="../portrait.jpg" alt="Dr. Yannik Zimmermann"></div>
+    <div class="cta-name">Dr. Yannik Zimmermann</div>
+    <div class="sec-label">N&auml;chster Schritt</div>
+    <div class="cta-title">Wir zeigen es dir an deinen Kunden</div>
+    <p class="cta-desc">W&auml;hl eine deiner Nischen. Wir machen die Research live und zeigen dir, was dabei rauskommt.</p>
+    <a href="https://cal.com/darkgravitylabs-yannik/consult" class="cta-btn" target="_blank" rel="noopener">LASS UNS REDEN</a>
+  </div>
+</div>
+</section>
+
+<footer>
+<div class="wrap">
+  <div class="foot">
+    <div class="foot-brand">Dark Gravity Labs</div>
+    <a class="foot-url" href="https://darkgravitylabs.com" target="_blank" rel="noopener">darkgravitylabs.com</a>
+  </div>
+</div>
+</footer>
+
+</body>
+</html>

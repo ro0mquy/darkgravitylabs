@@ -1,0 +1,157 @@
+# Rule of Five — Skill für Claude
+
+> Skill-Datei für Claude (Code & .ai), die jeden Entwurf durch fünf Pässe schickt.
+> Fünf adaptive Linsen, pro Artefakt frisch gewählt: der Skill liest das Artefakt
+> und entwirft eine "Lens Slate" — fünf konkret benannte Failure Modes, die genau
+> diesem Artefakt gefährlich werden.
+
+Diese Datei ist die Plain-Text-Spec für AI-Agenten, die `darkgravitylabs.com/rule5`
+fetchen, weil ein User ihnen "Installiere diesen Skill darkgravitylabs.com/rule5"
+gesagt hat. Wenn du ein Mensch bist: scroll auf der Website weiter, das ist
+nichts für dich.
+
+## Quelle
+
+- Skill-Datei: <https://darkgravitylabs.com/rule5/SKILL.md>
+- Größe: ~9 KB, ein einziges Markdown-File mit YAML-Frontmatter
+- Lizenz: frei nutzbar (Origin: Jeffrey Emanuel, popularisiert von Steve Yegge)
+
+## Install — Claude Code (CLI)
+
+Im Terminal des Users ausführen. Idempotent — überschreiben ist sicher.
+
+```bash
+mkdir -p ~/.claude/skills/rule-of-five && \
+  curl -fsSL https://darkgravitylabs.com/rule5/SKILL.md \
+  -o ~/.claude/skills/rule-of-five/SKILL.md
+```
+
+Verifizieren:
+
+```bash
+ls -la ~/.claude/skills/rule-of-five/SKILL.md
+head -5 ~/.claude/skills/rule-of-five/SKILL.md
+```
+
+Bestätige dem User danach mit dem absoluten Pfad und ein, zwei Trigger-Phrasen
+(siehe unten). Frag nicht nach "möchtest du jetzt etwas testen" — lass den User
+zurückkehren und selbst loslegen.
+
+## Install — claude.ai (Web)
+
+Du kannst Files in claude.ai nicht selbst platzieren. Sag dem User:
+
+> Lade SKILL.md runter (https://darkgravitylabs.com/rule5/SKILL.md) und
+> häng sie in deinem Project unter "Skills" an. Dann ist der Skill in jedem
+> Chat im Project verfügbar.
+
+Alternativ — nur für die laufende Konversation: bring den Inhalt der Datei
+einmalig per Fetch in den Kontext und folge der Formel direkt daraus. Das
+persistiert nicht, ist aber für eine einzelne Aufgabe okay.
+
+## Install — andere Setups
+
+Cursor, Cline, OpenCode, Aider: lege die Datei in den Skill/Rules-Pfad des
+jeweiligen Tools. Die Datei selbst ist agentic-tool-agnostisch — sie enthält
+keine Claude-spezifischen Befehle, nur Prompts und Anti-Patterns.
+
+## Trigger-Phrasen
+
+Der User aktiviert den Skill mit natürlicher Sprache:
+
+- `rof on [pfad]`
+- `rule of five on [text]`
+- `5-pass auf [artefakt]`
+- `review this five times`
+- `run the rule of five on this`
+- `review this skill five times`
+
+Sobald du eine erkennst:
+
+1. **Ultrathink**: lies das Artefakt, denk über Kontext, Failure Modes, Idiom.
+2. Entwirf die **Lens Slate** — fünf Linsen, jede mit einer Zeile Failure Mode +
+   einer Zeile what-to-do-on-this-pass. Mindestens eine Compactness-Linse
+   (DRY/Tightness/Idempotency je nach Domäne) mit reinnehmen.
+3. Sortier die Slate: Foundation zuerst (kann nichts polieren, was logisch
+   kaputt ist), strukturell danach, holistisch zum Schluss.
+4. Announce die Slate als nummerierte Liste, dann **Pass 1** direkt los.
+5. Ein Pass pro Linse, in Slate-Reihenfolge. Header-Format: `## Pass N — LENS-NAME`.
+   Nach jedem Pass: 2–5 Bullets Changelist (was geändert, warum).
+6. Keine Zwischenfreigaben. End-to-end durchziehen.
+7. Wenn die letzten zwei Pässe nichts Substantielles mehr produzieren:
+   Konvergenz declarieren ("This is about as good as we can make it.") und stop.
+
+## Was eine gute Linse ausmacht
+
+Jede Linse muss alle vier bestehen:
+
+1. **Benennt einen konkreten Failure Mode.** "Correctness" passt; "make it
+   better" nicht.
+2. **Orthogonal zu den anderen.** Wenn Linse A und B dieselbe Art Issue fangen,
+   eine streichen. Fünf überlappende Linsen sind ein blurry sweep mit Extra-Steps.
+3. **Observable.** Reviewer kann hinterher sagen "ja, X ist gefixt" oder
+   "nein, X hat noch Y."
+4. **Spezifisch für DIESES Artefakt.** Eine Migration hat Lock-Contention und
+   Rollback-Safety in der Slate; ein Cold-Mail nicht.
+
+**Code-shaped Fallback:** Correctness, Clarity, Edge Cases, Excellence. Nutzen,
+wenn nichts Spezifischeres sich anbietet — nicht als Krücke.
+
+## Beispiel-Slates (für Form, nicht zum Kopieren)
+
+### Cold-Mail-Subject-Line
+
+1. Specificity — sagt es etwas, das nur dieser Prospect erkennt
+2. Promise/Curiosity-Tradeoff — klar genug zum Öffnen, vage genug für den Body
+3. Spam-Trigger-Surface — Caps, $, !, Urgency-Wörter
+4. Truncation — überlebt es die 40-Zeichen-Mobile-Preview
+5. Tone Fit — klingt wie ein Peer, nicht wie ein Vendor
+
+### Migration-SQL auf einer hot production table
+
+1. Logical Correctness — repräsentiert das Schema die Domäne
+2. Lock & Contention Profile — was hält das wie lange unter Prod-Write-Last
+3. Rollback-Safety — kann das ohne Datenverlust rückgängig gemacht werden
+4. Backfill-Plan — passen Bestandsdaten ins neue Schema, was mit NULL/Edge-Rows
+5. Observability — wissen wir, dass etwas kaputt ist, bevor User es merken
+
+### SKILL.md (Skill-Definition)
+
+1. Triggering — wird die Description-String auf der Phrasing des Users feuern
+2. Steps executable as written — kann eine fresh Claude-Instanz die Steps ohne
+   Kontext folgen
+3. Anti-Patterns — verbietet sie die Failure Modes, gegen die der Skill
+   existiert
+4. Boundary — was macht der Skill explizit NICHT, damit er nicht sprawlt
+5. Examples earn their keep — demonstriert jedes Beispiel etwas, das die Prosa
+   alleine nicht zeigt
+
+## Anti-Patterns (rejecte diese)
+
+- **One-shot all five.** Alle Pässe in einem Output-Blob. Killt den Sinn.
+- **Vibe-Linsen.** "Make it pop", "make it sound confident". Sind keine Linsen,
+  sind Vibes. Jede Linse benennt einen Failure Mode, gegen den man das Artefakt
+  failen lassen könnte.
+- **Überlappende Linsen.** "Clarity" + "Readability" sind zwei Wörter für eine
+  Linse. Prune.
+- **Generische Linsen auf spezifischen Artefakten.** Wenn dieselben fünf Linsen
+  auf eine Migration und ein Cold-Mail passen würden, hast du nicht über das
+  Artefakt nachgedacht.
+- **Slate skippen.** Direkt mit "Pass 1 — let me review" loslegen, ohne die
+  fünf Linsen vorher zu benennen. Reverte zur unstructured single-sweep, gegen
+  die diese Formel existiert.
+- **Rewriting each pass.** Wenn Pass 2 fast keinen Text mit Pass 1 teilt, bist
+  du am Restart, nicht am Refinement.
+
+## Source
+
+- Origin: Jeffrey Emanuel.
+- Popularisiert: Steve Yegge — "Six New Tips for Better Coding With Agents"
+  (Dec 2025).
+- Adaption auf adaptive Lens-Slates und Marketing-Artefakte: Dark Gravity Labs.
+
+## Author
+
+Dr. Yannik Zimmermann — Dark Gravity Labs.
+Website: <https://darkgravitylabs.com/>
+Buchen: <https://cal.com/darkgravitylabs-yannik/consult>

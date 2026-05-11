@@ -84,10 +84,16 @@
     .search-input {
       width: 100%; min-height: 62px; border: 0; outline: 0;
       background: transparent; color: var(--text);
-      font: 700 clamp(1.28rem, 2.9vw, 1.95rem)/1.02 'Space Grotesk', 'Outfit', system-ui, sans-serif;
-      letter-spacing: -0.045em; padding: 0 1rem 0 0;
+      font: 300 clamp(1.35rem, 3vw, 2.05rem)/1.02 'Space Grotesk', 'Outfit', system-ui, sans-serif;
+      letter-spacing: -0.025em; padding: 0 1rem 0 0;
     }
-    .search-input::placeholder { color: var(--muted); font-weight: 500; letter-spacing: -0.03em; }
+    .search-input::placeholder {
+      color: var(--muted);
+      font: 400 clamp(0.78rem, 1.4vw, 0.95rem)/1 'JetBrains Mono', ui-monospace, monospace;
+      text-transform: uppercase; letter-spacing: 0.22em;
+      opacity: 0.85;
+    }
+    .input-shell:focus-within .search-input::placeholder { opacity: 0.55; }
     .suggestions {
       list-style: none; display: grid; gap: 0.55rem; margin-top: 0.75rem;
     }

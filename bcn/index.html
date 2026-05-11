@@ -1,0 +1,73 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>BCN MasterMind Briefings</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Personalized intro briefings for AdsAccelerator BCN MasterMind, May 14-17 2026. Built by Yannik (Dark Gravity Labs).">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🪐</text></svg>">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #fafafa; --surface: #ffffff; --surface-2: #f4f4f5;
+      --border: #e4e4e7; --text: #18181b; --dim: #52525b;
+      --accent: #0d9488; --accent-dim: rgba(20,184,166,0.10);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Outfit', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; -webkit-font-smoothing: antialiased; }
+    .mono { font-family: 'JetBrains Mono', monospace; }
+    .wrap { max-width: 880px; margin: 0 auto; padding: 0 2.5rem; }
+    .hero { padding: 6rem 0 3rem; }
+    .eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.2em;
+      color: var(--accent); font-weight: 500; margin-bottom: 1.2rem;
+    }
+    h1 em { font-style: normal; color: var(--accent); }
+    h1 { font-size: clamp(2rem, 4.5vw, 3.2rem); font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; margin-bottom: 1.2rem; }
+    .lead { font-size: 1.1rem; color: var(--dim); font-weight: 300; line-height: 1.7; max-width: 640px; margin-bottom: 1rem; }
+    .lead code {
+      font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;
+      background: var(--surface-2); border: 1px solid var(--border);
+      padding: 0.15rem 0.45rem; border-radius: 4px;
+    }
+    .gpt-cta {
+      background: var(--surface); border: 1px solid var(--border);
+      border-left: 3px solid var(--accent); border-radius: 8px;
+      padding: 1.5rem 1.6rem; margin: 2rem 0;
+    }
+    .gpt-cta strong { display: block; font-size: 1rem; margin-bottom: 0.6rem; }
+    .gpt-cta a {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.12em;
+      color: var(--accent); text-decoration: none; font-weight: 600;
+    }
+    .gpt-cta a:hover { color: var(--text); }
+    .foot { border-top: 1px solid var(--border); padding: 2.5rem 0 2rem; margin-top: 4rem; text-align: center; }
+    .foot-brand { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--dim); font-weight: 300; }
+    .foot-brand .heart { color: var(--accent); }
+    .foot-brand a { color: var(--dim); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+    .foot-brand a:hover { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <section class="hero">
+    <div class="wrap">
+      <div class="eyebrow">BCN MasterMind · May 14–17 2026</div>
+      <h1>Personalisierte <em>Intro-Briefings</em> für jeden im Raum.</h1>
+      <p class="lead">Such deine Seite: <code>darkgravitylabs.com/bcn/u/&lt;dein-name&gt;/</code></p>
+      <div class="gpt-cta">
+        <strong>Suchst du jemand Bestimmtes?</strong>
+        <a href="https://chat.openai.com/g/g-PLACEHOLDER-bcn-matchmaker">Frag den BCN Matchmaker →</a>
+      </div>
+    </div>
+  </section>
+  <footer>
+    <div class="wrap">
+      <div class="foot">
+        <div class="foot-brand">Built with <span class="heart">♥</span> by Yannik · <a href="https://darkgravitylabs.com" target="_blank">Dark Gravity Labs</a></div>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

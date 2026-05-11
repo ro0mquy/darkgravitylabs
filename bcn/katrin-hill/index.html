@@ -261,30 +261,21 @@
       border-radius: 4px; padding: 0.1rem 0.4rem; font-size: 0.62rem;
     }
     .intro-pair {
-      display: grid; grid-template-columns: 1fr 44px 1fr; gap: 1.2rem;
-      align-items: center; margin-bottom: 1.1rem;
+      display: grid; grid-template-columns: 1fr 64px 1fr; gap: 2.2rem;
+      align-items: start; margin-bottom: 1.4rem;
     }
     .intro-person {
-      display: grid; grid-template-columns: 56px 1fr; gap: 0.8rem;
-      align-items: center;
+      display: grid; grid-template-columns: 64px 1fr; gap: 1rem;
+      align-items: start;
     }
-    .intro-person .match-portrait { width: 56px; height: 56px; font-size: 0.85rem; }
+    .intro-person .match-portrait { width: 64px; height: 64px; font-size: 0.9rem; }
     .intro-arrow {
-      width: 44px; height: 44px; border-radius: 50%;
-      background: var(--accent-dim); color: var(--accent);
-      border: 1px solid var(--accent);
-      display: grid; place-items: center;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 1.15rem; font-weight: 700; line-height: 1;
-      justify-self: center; align-self: center;
-      position: relative;
+      align-self: center; justify-self: center;
+      color: var(--accent); font-weight: 400; line-height: 1;
+      font-family: 'Space Grotesk', system-ui, sans-serif;
+      font-size: 2.4rem; letter-spacing: -0.04em;
+      opacity: 0.85;
     }
-    .intro-arrow::before, .intro-arrow::after {
-      content: ""; position: absolute; top: 50%;
-      width: 0.9rem; height: 1px; background: var(--accent); opacity: 0.55;
-    }
-    .intro-arrow::before { right: 100%; margin-right: 0.3rem; }
-    .intro-arrow::after  { left:  100%; margin-left:  0.3rem; }
     .intro-name {
       font-size: 1rem; font-weight: 700; line-height: 1.25;
       margin-bottom: 0.15rem;
@@ -412,7 +403,7 @@
 <section class="sec">
   <div class="wrap">
     <div class="sec-label">🎯 Recommendation</div>
-    <div class="sec-title">Reach out to these people</div>
+    <div class="sec-title">These people can help you</div>
 
     
       
@@ -455,7 +446,7 @@
 <section class="sec">
   <div class="wrap">
     <div class="sec-label">🤝 Reciprocity</div>
-    <div class="sec-title">Help these people</div>
+    <div class="sec-title">You can help these people</div>
 
     
       

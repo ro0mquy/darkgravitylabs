@@ -1,73 +1,368 @@
 <!doctype html>
-<html lang="en">
+<html lang="de">
 <head>
   <meta charset="utf-8">
   <title>BCN MasterMind Briefings</title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="description" content="Personalized intro briefings for AdsAccelerator BCN MasterMind, May 14-17 2026. Built by Yannik (Dark Gravity Labs).">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🪐</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
       --bg: #fafafa; --surface: #ffffff; --surface-2: #f4f4f5;
       --border: #e4e4e7; --text: #18181b; --dim: #52525b;
-      --accent: #0d9488; --accent-dim: rgba(20,184,166,0.10);
+      --muted: #a1a1aa; --accent: #0d9488; --accent-dim: rgba(20,184,166,0.10);
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Outfit', system-ui, sans-serif; background: var(--bg); color: var(--text); line-height: 1.6; -webkit-font-smoothing: antialiased; }
-    .mono { font-family: 'JetBrains Mono', monospace; }
-    .wrap { max-width: 880px; margin: 0 auto; padding: 0 2.5rem; }
-    .hero { padding: 6rem 0 3rem; }
-    .eyebrow {
+    body {
+      font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+      background: var(--bg); color: var(--text);
+      line-height: 1.6; -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+    a { color: inherit; }
+    .ascii-bg {
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 0; overflow: hidden;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .ascii-bg pre {
+      font-family: 'Courier New', Courier, monospace;
+      font-size: 14px; line-height: 1.4;
+      color: rgba(20,184,166,0.045);
+      white-space: pre; text-align: center;
+      transform: translateY(1rem);
+    }
+    .page { max-width: 880px; margin: 0 auto; padding: 4.5rem 2.5rem 2rem; position: relative; z-index: 1; }
+    .topbar {
+      display: flex; justify-content: flex-start; align-items: center;
+      margin-bottom: 2rem;
+    }
+    .event-pill {
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.2em;
-      color: var(--accent); font-weight: 500; margin-bottom: 1.2rem;
+      color: var(--accent); font-weight: 500;
+    }
+    .hero { display: grid; gap: 2rem; align-items: start; }
+    .copy { max-width: 720px; }
+    h1 {
+      font-size: clamp(2rem, 4.5vw, 3.2rem);
+      font-weight: 800; letter-spacing: -0.03em; line-height: 1.1;
+      margin-bottom: 1rem;
     }
     h1 em { font-style: normal; color: var(--accent); }
-    h1 { font-size: clamp(2rem, 4.5vw, 3.2rem); font-weight: 800; letter-spacing: -0.03em; line-height: 1.1; margin-bottom: 1.2rem; }
-    .lead { font-size: 1.1rem; color: var(--dim); font-weight: 300; line-height: 1.7; max-width: 640px; margin-bottom: 1rem; }
-    .lead code {
-      font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;
-      background: var(--surface-2); border: 1px solid var(--border);
-      padding: 0.15rem 0.45rem; border-radius: 4px;
+    .lead {
+      max-width: 640px; font-size: 1.1rem; color: var(--dim);
+      font-weight: 300; line-height: 1.7;
     }
-    .gpt-cta {
+    .search-card {
+      width: min(100%, 700px);
       background: var(--surface); border: 1px solid var(--border);
       border-left: 3px solid var(--accent); border-radius: 8px;
-      padding: 1.5rem 1.6rem; margin: 2rem 0;
+      padding: 1.35rem 1.45rem;
     }
-    .gpt-cta strong { display: block; font-size: 1rem; margin-bottom: 0.6rem; }
-    .gpt-cta a {
+    .input-shell {
+      position: relative; display: flex; align-items: center;
+      border: 1px solid var(--border); border-radius: 6px;
+      background: var(--surface); transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .input-shell:focus-within {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px var(--accent-dim);
+    }
+    .search-icon {
+      width: 52px; flex: 0 0 52px; color: var(--accent);
+      display: grid; place-items: center;
+    }
+    .search-icon svg {
+      width: 18px; height: 18px; display: block;
+      stroke: currentColor; stroke-width: 2; fill: none;
+      stroke-linecap: round; stroke-linejoin: round;
+    }
+    .search-input {
+      width: 100%; min-height: 62px; border: 0; outline: 0;
+      background: transparent; color: var(--text);
+      font: 700 clamp(1.28rem, 2.9vw, 1.95rem)/1.02 'Space Grotesk', 'Outfit', system-ui, sans-serif;
+      letter-spacing: -0.045em; padding: 0 1rem 0 0;
+    }
+    .search-input::placeholder { color: var(--muted); font-weight: 500; letter-spacing: -0.03em; }
+    .suggestions {
+      list-style: none; display: grid; gap: 0.55rem; margin-top: 0.75rem;
+    }
+    .search-empty {
+      padding: 0.8rem 0.9rem; border: 1px dashed var(--border);
+      border-radius: 6px; color: var(--muted); background: var(--surface-2);
+      font-size: 0.9rem;
+    }
+    .suggestion a {
+      display: grid; grid-template-columns: 40px minmax(0, 1fr) auto;
+      gap: 0.8rem; align-items: center;
+      padding: 0.7rem; border: 1px solid var(--border); border-radius: 6px;
+      background: var(--surface-2); text-decoration: none; color: var(--text);
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .suggestion a:hover, .suggestion a.is-active {
+      border-color: var(--accent); background: var(--surface);
+    }
+    .avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      display: grid; place-items: center;
+      background: var(--accent-dim); color: var(--accent);
+      font: 600 0.82rem/1 'JetBrains Mono', monospace;
+      letter-spacing: 0.04em;
+    }
+    .result-name {
+      display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      font-weight: 700; letter-spacing: -0.01em; font-size: 1rem;
+    }
+    .result-meta {
+      display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      color: var(--dim); font-size: 0.84rem; margin-top: 0.05rem;
+    }
+    .result-action {
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.12em;
-      color: var(--accent); text-decoration: none; font-weight: 600;
+      color: var(--accent); font-size: 0.66rem; letter-spacing: 0.12em;
+      text-transform: uppercase; font-weight: 700; white-space: nowrap;
     }
-    .gpt-cta a:hover { color: var(--text); }
-    .foot { border-top: 1px solid var(--border); padding: 2.5rem 0 2rem; margin-top: 4rem; text-align: center; }
-    .foot-brand { font-family: 'JetBrains Mono', monospace; font-size: 0.78rem; color: var(--dim); font-weight: 300; }
-    .foot-brand .heart { color: var(--accent); }
-    .foot-brand a { color: var(--dim); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
-    .foot-brand a:hover { color: var(--accent); }
+    .gpt-card {
+      margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    }
+    .gpt-card strong { display: block; font-size: 1rem; }
+    .gpt-card span { display: block; color: var(--dim); font-size: 0.92rem; margin-top: 0.1rem; font-weight: 300; }
+    .gpt-card a {
+      flex-shrink: 0; text-decoration: none;
+      padding: 0.58rem 0.82rem; border-radius: 4px;
+      border: 1px solid var(--border); color: var(--accent);
+      font: 600 0.72rem/1 'JetBrains Mono', monospace;
+      text-transform: uppercase; letter-spacing: 0.11em;
+      transition: color 0.2s, border-color 0.2s, background 0.2s;
+    }
+    .gpt-card a:hover { border-color: var(--accent); background: var(--accent-dim); }
+    .footer {
+      display: flex; justify-content: space-between; align-items: center; gap: 1rem;
+      margin-top: 4rem; padding-top: 2rem; border-top: 1px solid var(--border);
+      color: var(--dim); font: 300 0.78rem/1.4 'JetBrains Mono', monospace;
+    }
+    .heart { color: var(--accent); }
+    .footer a { text-decoration: none; border-bottom: 1px solid transparent; }
+    .footer a:hover { color: var(--accent); border-bottom-color: var(--accent); }
+
+    @media (max-width: 768px) {
+      .ascii-bg pre { font-size: 10px; line-height: 1.3; color: rgba(20,184,166,0.035); }
+      .page { padding: 3.2rem 1.2rem 1.6rem; }
+      .topbar { margin-bottom: 1.4rem; }
+      .event-pill { font-size: 0.72rem; letter-spacing: 0.16em; }
+      .hero { gap: 1.35rem; }
+      h1 { font-size: clamp(2rem, 9.5vw, 2.7rem); margin-bottom: 0.75rem; }
+      .lead { font-size: 1rem; line-height: 1.55; }
+      .search-card { width: 100%; padding: 1rem; }
+      .search-icon { width: 44px; flex-basis: 44px; }
+      .search-icon svg { width: 16px; height: 16px; }
+      .search-input { min-height: 54px; font-size: 1.18rem; }
+      .suggestion a {
+        grid-template-columns: 38px minmax(0, 1fr);
+        padding: 0.6rem;
+      }
+      .avatar { width: 38px; height: 38px; }
+      .result-action { display: none; }
+      .gpt-card { display: grid; gap: 0.75rem; }
+      .gpt-card a { text-align: center; padding: 0.76rem 0.9rem; }
+      .footer { display: grid; gap: 0.75rem; }
+    }
   </style>
 </head>
 <body>
-  <section class="hero">
-    <div class="wrap">
-      <div class="eyebrow">BCN MasterMind · May 14–17 2026</div>
-      <h1>Personalisierte <em>Intro-Briefings</em> für jeden im Raum.</h1>
-      <p class="lead">Such deine Seite: <code>darkgravitylabs.com/bcn/u/&lt;dein-name&gt;/</code></p>
-      <div class="gpt-cta">
-        <strong>Suchst du jemand Bestimmtes?</strong>
-        <a href="https://chat.openai.com/g/g-PLACEHOLDER-bcn-matchmaker">Frag den BCN Matchmaker →</a>
+  <div class="ascii-bg" aria-hidden="true">
+    <pre>
+                                      +*%#.        .*#%*+
+                                 =#%*.    -+##+-      .*%#=
+                              +%#-      +#*.  .*#+      -#%+
+                           =%#-       +#*        *#+       -%#=
+                        .#%-        =#*          *#=        -%#.
+                      +%+         -%#-            -#%-         +%+
+                    =%+          +%+                +%+          +%=
+                  -%+          .%#.    .+#####+.    .#%.          +%-
+                .%#.          -%#.   +#%*-  -*%#+   .#%-          .#%.
+               +%-           =%#.  =%#-        -#%=  .#%=           -%+
+             .%#            =#%. .#%-            -%#. .%#=            #%.
+            =%=            +%+  -%#                #%-  +%+            =%=
+           #%            .%#. +%+                  +%+ .#%.            %#
+         .%#            -%#. =%=      +#####+      =%=  #%-            #%.
+        -%+            =%#  +%-     =%*.   .*%=     -%+ .#%=            +%-
+       +%-            +%+ .%#     -%#.       .#%-    #%. +%+            -%+
+      #%.            #%- -%+    .%#.           #%.   +%- -%#            .%#
+     %#            .%#. +%-    +%-      .      -%+   -%+  #%.            #%
+    %#            -%#  +%=   .%#     -+#%#+.    #%.   =%+ .#%-            #%
+   %#            =%#  +%-   -%+    =%*. .*%=   +%-   -%+  #%=            #%
+  ##            +%+  #%.   +%=   -%#.     .#%- =%+   .%#  +%+            ##
+ ##            #%-  #%-   #%.  .%#    =#=   #%. %#   -%#  -%#            ##
+.#           -%#  .%#   =%=   +%-   =%#%=  -%+ =%=   #%.  #%-           #.
+#.          =%#   #%.  +%-   #%.  -%#. #%- +%=  -%+ .%#   #%=          .#
+#          +%+   %#   #%.  =%=  +%+    +%+ %#   .%# #%   +%+          #
+#         #%-  .%#  .%#  +%-  #%-      -%##%.    #%#%.  -%#         #
+#        #%   -%#   #%  #%.  %#         +%+      +%+   #%   #%        #
+#       %#   =%#   %#  %#  .%+                        +%.  #%   #%       #
+#      ##   +%+   ##  ##  +%                          %+  ##   +%+   ##      #
+#     .#   #%-   .#  .#  #%                          %#  #.   -%#   #.     #
+#     #   #%     #  #  %#                          #%  #  #     %#   #     #
+#    #   %#     #  #  ##                          ##  #  #     #%   #    #
+#    #  ##     #  #  #.                          .#  #  #     ##  #    #
+ #  #  #.     #  #  #                            #  #  #     .#  #  #
+  ##  #      # .#  #                            #  #. #      #  ##
+     #      # .#  #              ..              #  #. #      #
+           #  #  #           .+#%%#+.           #  #  #
+          #  #  #          =%#=   =#%=          #  #  #
+         #  #  #         +%+         +%+         #  #  #
+        .  #  #.        #%             %#        .#  #  .
+           #  #        %#               #%        #  #
+           #  #       ##                 ##       #  #
+              #.     .#                   #.     .#
+              #      #                     #      #
+              #.    .#                     #.    .#
+               #    #                       #    #
+               #    #                       #    #
+                #  #                         #  #
+                 ##                           ##
+    </pre>
+  </div>
+  <main class="page">
+    <nav class="topbar" aria-label="BCN briefing navigation">
+      <div class="event-pill">BCN MasterMind · May 14-17 2026</div>
+    </nav>
+
+    <section class="hero">
+      <div class="copy">
+        <h1>Finde dein <em>persönliches Intro-Briefing</em>.</h1>
+        <p class="lead">Tipp deinen Namen ein. Du bekommst sofort die Menschen, die dir helfen können, und die Menschen, denen du helfen kannst.</p>
       </div>
-    </div>
-  </section>
-  <footer>
-    <div class="wrap">
-      <div class="foot">
-        <div class="foot-brand">Built with <span class="heart">♥</span> by Yannik · <a href="https://darkgravitylabs.com" target="_blank">Dark Gravity Labs</a></div>
-      </div>
-    </div>
-  </footer>
+
+      <aside class="search-card" aria-label="Briefing search">
+        <div class="search-inner">
+          <label class="input-shell" for="attendee-search">
+            <span class="search-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"></circle><path d="m16.5 16.5 4 4"></path></svg></span>
+            <input id="attendee-search" class="search-input" type="search" placeholder="Dein Name" autocomplete="off" inputmode="search" autofocus>
+          </label>
+          <ul id="suggestions" class="suggestions" aria-live="polite"></ul>
+          <div class="gpt-card">
+            <div>
+              <strong>Suchst du jemand Bestimmtes?</strong>
+              <span>Frag den Matchmaker nach Bedarf, Thema oder Branche.</span>
+            </div>
+            <a href="https://chat.openai.com/g/g-PLACEHOLDER-bcn-matchmaker">GPT öffnen</a>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <footer class="footer">
+      <span>Built with <span class="heart">♥</span> by Yannik</span>
+      <a href="https://darkgravitylabs.com" target="_blank" rel="noopener">Dark Gravity Labs</a>
+    </footer>
+  </main>
+
+  <script>
+    const attendees = [{"name": "Alexander Bunk", "company": "alfima.io", "location": "Hamburg, Germany", "url": "alexander-bunk/"}, {"name": "Alexandra Müller", "company": "", "location": "Bamberg, Germany", "url": "alexandra-muller/"}, {"name": "Andy Lien", "company": "Lien Media GmbH", "location": "Dortmund, Germany", "url": "andy-lien/"}, {"name": "Aníbal Déniz", "company": "anibaldeniz.com", "location": "Las Palmas de Gran Canaria, Spain", "url": "anibal-deniz/"}, {"name": "Anton Kroisant", "company": "Memberspot", "location": "Stuttgart, Germany", "url": "anton-kroisant/"}, {"name": "Aylin Hikl", "company": "Logical Lemon", "location": "Germany", "url": "aylin-hikl/"}, {"name": "Bastian Hegerfeld", "company": "BestForm Bastian", "location": "Osnabrück, Germany", "url": "bastian-hegerfeld/"}, {"name": "Benjamin Kleber", "company": "Captain WordPress", "location": "Berlin, Germany", "url": "benjamin-kleber/"}, {"name": "Berthold Schöllhorn", "company": "Blaugold GmbH Steuerberatungsgesellschaft", "location": "Vogt, Germany", "url": "berthold-schollhorn/"}, {"name": "Brigitta Tauch", "company": "Hill Marketing GmbH", "location": "Graz, Austria", "url": "brigitta-tauch/"}, {"name": "Burkhard Küpper", "company": "Küpper & Kollegen Steuerberatung", "location": "Düsseldorf, Germany", "url": "burkhard-kupper/"}, {"name": "Carolin Flender", "company": "", "location": "Siegen, Germany", "url": "carolin-flender/"}, {"name": "Christian Kahle-Melcher", "company": "FACULTY Consulting", "location": "Steindorf am Ossiacher See, Austria", "url": "christian-kahle-melcher/"}, {"name": "Christian Stockklauser", "company": "ioumi", "location": "Wolfurt, Austria", "url": "christian-stockklauser/"}, {"name": "Christiane Baumann", "company": "Christiane Baumann", "location": "Munich, Germany", "url": "christiane-baumann/"}, {"name": "Christoph Schreiber", "company": "Digital Beat GmbH", "location": "Köln, Germany", "url": "christoph-schreiber/"}, {"name": "Christopher Schauf", "company": "Christopher-Schauf.de", "location": "Düsseldorf, Germany", "url": "christopher-schauf/"}, {"name": "Claudia Mönnig", "company": "Soulcialful Media", "location": "Berlin, Germany", "url": "claudia-monnig/"}, {"name": "Constanze Fleischmann", "company": "Letter_dir_einen", "location": "Regensburg, Germany", "url": "constanze-fleischmann/"}, {"name": "Daniel Mayr", "company": "Alpsclick", "location": "Bolzano, Italy", "url": "daniel-mayr/"}, {"name": "Daria Petuchov", "company": "", "location": "Berlin, Germany", "url": "daria-petuchov/"}, {"name": "Dario Cigoje", "company": "VIDARIO Media", "location": "Germany", "url": "dario-cigoje/"}, {"name": "David Hollerer", "company": "HD CREATOR", "location": "Austria", "url": "david-hollerer/"}, {"name": "Dennis Seiter", "company": "Dennis Seiter Fotografie", "location": "Basel Metropolitan Area, Switzerland", "url": "dennis-seiter/"}, {"name": "Diana Stockklauser", "company": "DS Executive Coaching", "location": "Schwarzach, Austria", "url": "diana-stockklauser/"}, {"name": "Dominic Pfeffer", "company": "KONTAKTEREI", "location": "Vienna, Austria", "url": "dominic-pfeffer/"}, {"name": "Emanuel Hacker", "company": "Digital Business Consulting", "location": "Graz, Austria", "url": "emanuel-hacker/"}, {"name": "Eric Parthun", "company": "Kreativbox Parthun", "location": "Neckarsulm, Germany", "url": "eric-parthun/"}, {"name": "Fadi Tchallo", "company": "Impuls Events", "location": "Brunswick, Germany", "url": "fadi-tchallo/"}, {"name": "Faruk Becirovic", "company": "Digitalgeschick", "location": "Steyr, Austria", "url": "faruk-becirovic/"}, {"name": "Fritz Lanbin", "company": "Memberspot", "location": "Barcelona, Spain", "url": "fritz-lanbin/"}, {"name": "Garrit Willson", "company": "KI-Pionier Akademie", "location": "Berlin, Germany", "url": "garrit-willson/"}, {"name": "Gayane Babelyan", "company": "Gayane Babelyan", "location": "Germany", "url": "gayane-babelyan/"}, {"name": "Helen Kluge", "company": "", "location": "", "url": "helen-kluge/"}, {"name": "Helmut Vorraber", "company": "INCRDBL Digital Labs", "location": "Graz, Austria", "url": "helmut-vorraber/"}, {"name": "Henri Werner", "company": "SlideRevolution", "location": "Germany", "url": "henri-werner/"}, {"name": "Ismar Bravo", "company": "Bravo Media GmbH", "location": "Dortmund, Germany", "url": "ismar-bravo/"}, {"name": "Jacqueline Strecker", "company": "", "location": "", "url": "jacqueline-strecker/"}, {"name": "Jakob Hager", "company": "MENTORTOOLS", "location": "United Arab Emirates", "url": "jakob-hager/"}, {"name": "Jens Neubeck", "company": "Sales Angels", "location": "Grünstadt, Germany", "url": "jens-neubeck/"}, {"name": "Jessica Goschala", "company": "", "location": "", "url": "jessica-goschala/"}, {"name": "Julia Trost", "company": "", "location": "Saarbrücken, Germany", "url": "julia-trost/"}, {"name": "Kathrin Hansen", "company": "Kathrin Hansen Coaching", "location": "Flensburg, Germany", "url": "kathrin-hansen/"}, {"name": "Katja Schanz", "company": "Katja Schanz", "location": "Werder, Germany", "url": "katja-schanz/"}, {"name": "Katrin Hill", "company": "", "location": "", "url": "katrin-hill/"}, {"name": "Klaus Buchroithner", "company": "Das Merch.", "location": "Linz, Austria", "url": "klaus-buchroithner/"}, {"name": "Laura Schadt", "company": "adcompany", "location": "", "url": "laura-schadt/"}, {"name": "Lena Thiemann", "company": "", "location": "Hamburg, Germany", "url": "lena-thiemann/"}, {"name": "Leon Langhorst", "company": "Scale Mentor GmbH", "location": "City of Cape Town, South Africa", "url": "leon-langhorst/"}, {"name": "Leonard Lehne", "company": "TheTraveleo", "location": "Hamburg, Germany", "url": "leonard-lehne/"}, {"name": "Line Sulzbacher", "company": "", "location": "Linz-Wels-Steyr Area, Austria", "url": "line-sulzbacher/"}, {"name": "Lisa Maria Poten", "company": "LOVEjourney", "location": "Wernberg, Austria", "url": "lisa-maria-poten/"}, {"name": "Luca Brinkhues", "company": "Steiger & Partner GmbH", "location": "Troisdorf, Germany", "url": "luca-brinkhues/"}, {"name": "Madeleine Tang", "company": "TikTok", "location": "Dublin, Ireland", "url": "madeleine-tang/"}, {"name": "Marc Roth", "company": "WineStreet Media GmbH", "location": "Rhein-Neckar Metropolitan Region, Germany", "url": "marc-roth/"}, {"name": "María Velasco Laprea (Patrick W)", "company": "GenIAI Agents", "location": "Alella, Spain", "url": "maria-velasco-laprea-patrick-w/"}, {"name": "Mark Becker", "company": "markbecker.one", "location": "Rhein-Neckar Metropolitan Region, Germany", "url": "mark-becker/"}, {"name": "Markus Bosch", "company": "7FigureFunnels", "location": "Munich, Germany", "url": "markus-bosch/"}, {"name": "Markus Vieghofer", "company": "MV Consulting", "location": "Leonding, Austria", "url": "markus-vieghofer/"}, {"name": "Martin Limbeck", "company": "ezeeleads", "location": "Dinslaken, Germany", "url": "martin-limbeck/"}, {"name": "Martin Masching", "company": "Powerinsole", "location": "Austria", "url": "martin-masching/"}, {"name": "Mateo Sudar", "company": "SU SQUAD Online Marketing", "location": "Heppenheim an der Bergstrasse, Germany", "url": "mateo-sudar/"}, {"name": "Matthias Kupka", "company": "The Brunch Club", "location": "Germany", "url": "matthias-kupka/"}, {"name": "Matthieu Schuler", "company": "Schuler Finance GmbH", "location": "Karlsruhe, Germany", "url": "matthieu-schuler/"}, {"name": "Maximilian Ceolan", "company": "Emploi", "location": "Merano, Italy", "url": "maximilian-ceolan/"}, {"name": "Maximilian Krämer", "company": "DNK Rechtsanwälte", "location": "Munich, Germany", "url": "maximilian-kramer/"}, {"name": "Maximilian Poten", "company": "FACULTY Consulting", "location": "Finkenstein am Faaker See, Austria", "url": "maximilian-poten/"}, {"name": "Meike Lübbert", "company": "Next Sales Consulting GmbH", "location": "Hamburg, Germany", "url": "meike-lubbert/"}, {"name": "Melanie Pfeiffer", "company": "madea", "location": "Linz, Austria", "url": "melanie-pfeiffer/"}, {"name": "Michael Merkl", "company": "Reelfix", "location": "Greater Munich Metropolitan Area, Germany", "url": "michael-merkl/"}, {"name": "Michael Schirnhofer", "company": "INCRDBL", "location": "Zeltweg, Austria", "url": "michael-schirnhofer/"}, {"name": "Michael Schmieder", "company": "Full-time", "location": "Spain", "url": "michael-schmieder/"}, {"name": "Michelle Lenz", "company": "TacticWorks", "location": "Cologne, Germany", "url": "michelle-lenz/"}, {"name": "Monique Menesi", "company": "Neustart USA", "location": "United States", "url": "monique-menesi/"}, {"name": "Nicole Houf", "company": "Unikat Business Club Düsseldorf/Niederrhein", "location": "Grefrath, Germany", "url": "nicole-houf/"}, {"name": "Nike Tiemann", "company": "Gesundhaut GmbH", "location": "Greater Bremen Area, Germany", "url": "nike-tiemann/"}, {"name": "Patrick Neukirch", "company": "Patrick Neukirch", "location": "Köln, Germany", "url": "patrick-neukirch/"}, {"name": "Patrick Steinhofer", "company": "CLAVICTORY", "location": "Salzburg, Austria", "url": "patrick-steinhofer/"}, {"name": "Patrick Wind(büchler) 😃", "company": "Europe's #1 MasterMind", "location": "Barcelona, Spain", "url": "patrick-wind-buchler/"}, {"name": "Patrick Zimmer", "company": "MINDROOM", "location": "Frankfurt am Main, Germany", "url": "patrick-zimmer/"}, {"name": "Philip Pircher", "company": "Emploi", "location": "Bolzano, Italy", "url": "philip-pircher/"}, {"name": "Philip Pöppinghaus", "company": "Pöppinghaus Consulting GmbH", "location": "Cologne, Germany", "url": "philip-poppinghaus/"}, {"name": "Philipp Follmer", "company": "Freedom-Writer-Academy", "location": "", "url": "philipp-follmer/"}, {"name": "Philipp Kadel", "company": "DIAGONAL GRUPPE", "location": "Buchholz in der Nordheide, Germany", "url": "philipp-kadel/"}, {"name": "René Tzschoppe", "company": "AUTIMA® - Marketing Automation", "location": "Werder, Germany", "url": "rene-tzschoppe/"}, {"name": "Robby Schadt", "company": "", "location": "", "url": "robby-schadt/"}, {"name": "Roberta Hutton", "company": "Neustart USA", "location": "Fort Myers, United States", "url": "roberta-hutton/"}, {"name": "Santiago Umaña", "company": "FlowMakers.io", "location": "Valencia, Spain", "url": "santiago-umana/"}, {"name": "Savvas Kyritsis", "company": "IMOS Real Estate", "location": "Dubai, United Arab Emirates", "url": "savvas-kyritsis/"}, {"name": "Shayan Dadras", "company": "EYL Group", "location": "Düsseldorf, Germany", "url": "shayan-dadras/"}, {"name": "Simone Neier", "company": "Simone Neier - Training | Coaching | Mentoring", "location": "Rankweil, Austria", "url": "simone-neier/"}, {"name": "Simone Seidl", "company": "Mag. Simone Seidl Intuitive Success Coach", "location": "Vienna, Austria", "url": "simone-seidl/"}, {"name": "Sonja Kreye", "company": "Kreye consulting GmbH", "location": "Weinheim, Germany", "url": "sonja-kreye/"}, {"name": "Sonja Masching", "company": "Powerinsole VertriebsgbmH", "location": "Salzburg, Austria", "url": "sonja-masching/"}, {"name": "Sophie Muhs", "company": "Impuls Events", "location": "Wolfenbüttel, Germany", "url": "sophie-muhs/"}, {"name": "Stefan Depta", "company": "Stefan Depta Consulting", "location": "Munich, Germany", "url": "stefan-depta/"}, {"name": "Stefan Kessels", "company": "foxwork", "location": "Essen, Germany", "url": "stefan-kessels/"}, {"name": "Stephy Beck", "company": "semco Service Management Consulting GmbH", "location": "Abu Dhabi, United Arab Emirates", "url": "stephy-beck/"}, {"name": "Sven Schnurr", "company": "Skillagents", "location": "Nuremberg, Germany", "url": "sven-schnurr/"}, {"name": "Tatjana Smirnov", "company": "Impulse Events", "location": "", "url": "tatjana-smirnov/"}, {"name": "Theresa Hoffmann", "company": "Girl Got Business", "location": "Köln, Germany", "url": "theresa-hoffmann/"}, {"name": "Theresa Sturm", "company": "VIA Digital", "location": "Linz, Austria", "url": "theresa-sturm/"}, {"name": "Thomas Maass", "company": "Memberspot", "location": "Dortmund, Germany", "url": "thomas-maass/"}, {"name": "Til Wiesenberg", "company": "BRYGHT", "location": "Essen, Germany", "url": "til-wiesenberg/"}, {"name": "Tim Gelhausen", "company": "Tim Gelhausen", "location": "Cologne, Germany", "url": "tim-gelhausen/"}, {"name": "Tobias Turk", "company": "Tobias Turk", "location": "Graz, Austria", "url": "tobias-turk/"}, {"name": "Tommy Martin", "company": "", "location": "", "url": "tommy-martin/"}, {"name": "Udo Voithofer", "company": "Trimando Solutions GmbH", "location": "Goldegg, Austria", "url": "udo-voithofer/"}, {"name": "Vitalij König", "company": "DIAGONAL Gruppe", "location": "Buchholz in der Nordheide, Germany", "url": "vitalij-konig/"}, {"name": "Yannik Zimmermann", "company": "", "location": "", "url": "yannik-zimmermann/"}, {"name": "Zeke Novarino", "company": "Agency Heaven", "location": "Rosario, Argentina", "url": "zeke-novarino/"}, {"name": "Zuzana Hager", "company": "MENTORTOOLS", "location": "Switzerland", "url": "zuzana-hager/"}, {"name": "Remo Fyda", "company": "ProvenExpert.com", "location": "Berlin, Germany", "url": "remo-fyda/"}, {"name": "Ralf Schmitz", "company": "Ralf Schmitz Marketing", "location": "Andernach, Germany", "url": "ralf-schmitz/"}, {"name": "Alessandro Scacchia", "company": "", "location": "", "url": "alessandro-scacchia/"}, {"name": "Deborah Heiss", "company": "", "location": "", "url": "deborah-heiss/"}, {"name": "Denisa Berankova", "company": "KESCH", "location": "", "url": "denisa-berankova/"}, {"name": "Gabriel Reifinger", "company": "", "location": "", "url": "gabriel-reifinger/"}, {"name": "Manuel Tschurtschenthaler", "company": "", "location": "", "url": "manuel-tschurtschenthaler/"}, {"name": "Maximilian Göhler", "company": "", "location": "", "url": "maximilian-gohler/"}, {"name": "Veronica De Odorico", "company": "ProvenExpert", "location": "", "url": "veronica-de-odorico/"}];
+    const input = document.getElementById('attendee-search');
+    const list = document.getElementById('suggestions');
+    let activeIndex = -1;
+    let currentMatches = [];
+
+    function normalize(value) {
+      return value.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+    }
+
+    function escapeHtml(value) {
+      return String(value).replace(/[&<>"']/g, char => ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;',
+      })[char]);
+    }
+
+    function initials(name) {
+      const parts = name.trim().split(/\s+/).filter(Boolean);
+      if (parts.length === 0) return '?';
+      if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+      return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    }
+
+    function route(url) {
+      return window.location.protocol === 'file:' ? `${url}index.html` : url;
+    }
+
+    function rank(attendee, query) {
+      const name = normalize(attendee.name);
+      if (!name.includes(query)) return -1;
+      if (name.startsWith(query)) return 100;
+      if (name.split(' ').some(part => part.startsWith(query))) return 80;
+      return 20;
+    }
+
+    function render(query) {
+      const q = normalize(query.trim());
+      activeIndex = -1;
+      if (!q) {
+        currentMatches = [];
+        list.innerHTML = '';
+        return;
+      }
+      currentMatches = attendees
+        .map(a => ({ ...a, _rank: rank(a, q) }))
+        .filter(a => a._rank >= 0)
+        .sort((a, b) => b._rank - a._rank || a.name.localeCompare(b.name))
+        .slice(0, 7);
+
+      if (currentMatches.length === 0) {
+        list.innerHTML = '<li class="search-empty">Keine Treffer. Probier Vor- oder Nachnamen.</li>';
+        return;
+      }
+
+      list.innerHTML = currentMatches.map((a, index) => `
+        <li class="suggestion">
+          <a href="${route(a.url)}" data-index="${index}">
+            <span class="avatar">${escapeHtml(initials(a.name))}</span>
+            <span>
+              <span class="result-name">${escapeHtml(a.name)}</span>
+              <span class="result-meta">${escapeHtml(a.company || a.location || 'BCN MasterMind')}</span>
+            </span>
+            <span class="result-action">Öffnen</span>
+          </a>
+        </li>
+      `).join('');
+    }
+
+    function paintActive() {
+      list.querySelectorAll('a').forEach((link, index) => {
+        link.classList.toggle('is-active', index === activeIndex);
+      });
+    }
+
+    input.addEventListener('input', event => render(event.target.value));
+    input.addEventListener('focus', event => render(event.target.value));
+    input.addEventListener('keydown', event => {
+      if (!currentMatches.length) return;
+      if (event.key === 'ArrowDown') {
+        event.preventDefault();
+        activeIndex = Math.min(activeIndex + 1, currentMatches.length - 1);
+        paintActive();
+      } else if (event.key === 'ArrowUp') {
+        event.preventDefault();
+        activeIndex = Math.max(activeIndex - 1, 0);
+        paintActive();
+      } else if (event.key === 'Enter' && activeIndex >= 0) {
+        event.preventDefault();
+        window.location.href = route(currentMatches[activeIndex].url);
+      } else if (event.key === 'Escape') {
+        input.value = '';
+        render('');
+      }
+    });
+    render('');
+  </script>
 </body>
 </html>

@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Content Engine | Dark Gravity Labs</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🪐</text></svg>">
+<meta name="description" content="A content machine for agencies and brands: voice-of-market research + your client's brand DNA go in &mdash; finished, on-brand social posts come out. In their voice, not ChatGPT's.">
+<link rel="canonical" href="https://darkgravitylabs.com/ai-content-engine/index-en.html">
+<link rel="alternate" hreflang="de" href="https://darkgravitylabs.com/ai-content-engine/">
+<link rel="alternate" hreflang="en" href="https://darkgravitylabs.com/ai-content-engine/index-en.html">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://darkgravitylabs.com/ai-content-engine/index-en.html">
+<meta property="og:title" content="AI Content Engine &mdash; raw material in, on-brand content out">
+<meta property="og:description" content="Voice-of-market research + brand DNA in, finished Instagram posts &amp; carousels out. With a real sample built from Checkfox's market.">
+<meta property="og:image" content="https://darkgravitylabs.com/ai-content-engine/screenshots/og.jpg">
+<meta property="og:locale" content="en_US">
+<meta property="og:locale:alternate" content="de_DE">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI Content Engine &mdash; raw material in, on-brand content out">
+<meta name="twitter:description" content="A content machine for agencies and brands. On-brand social posts in your client's voice, not the chatbot's.">
+<meta name="twitter:image" content="https://darkgravitylabs.com/ai-content-engine/screenshots/og.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #09090b; --surface: #18181b; --surface-2: #27272a;
+    --border: #3f3f46; --text: #fafafa; --dim: #a1a1aa;
+    --accent: #34d399; --accent-dim: rgba(52,211,153,0.12);
+    --red: #fb7185; --red-dim: rgba(251,113,133,0.12);
+    --warm: #fbbf24;
+  }
+  @media (prefers-color-scheme: light) {
+    :root {
+      --bg: #fafafa; --surface: #ffffff; --surface-2: #f4f4f5;
+      --border: #e4e4e7; --text: #18181b; --dim: #71717a;
+      --accent: #059669; --accent-dim: rgba(5,150,105,0.08);
+      --red: #e11d48; --red-dim: rgba(225,29,72,0.06);
+      --warm: #b45309;
+    }
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Outfit', system-ui, -apple-system, sans-serif;
+    background: var(--bg); color: var(--text);
+    line-height: 1.6; font-size: 16px;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ASCII Background Texture */
+  .ascii-bg {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    pointer-events: none; z-index: 0; overflow: hidden;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .ascii-bg pre {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 14px; line-height: 1.4;
+    color: rgba(52,211,153,0.15);
+    white-space: pre; text-align: center;
+  }
+  @media (prefers-color-scheme: light) {
+    .ascii-bg pre { color: rgba(5,150,105,0.10); }
+  }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 0 2.5rem; }
+
+  /* Animations */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  .anim-up { animation: fadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) both; }
+  .anim-in { animation: fadeIn 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; }
+  .d1 { animation-delay: 0.1s; } .d2 { animation-delay: 0.2s; }
+  .d3 { animation-delay: 0.3s; } .d4 { animation-delay: 0.4s; }
+  .d5 { animation-delay: 0.5s; } .d6 { animation-delay: 0.6s; }
+
+  /* Hero — asymmetric left-aligned */
+  .hero {
+    min-height: 100dvh; display: flex; align-items: center;
+    padding: 6rem 0; position: relative; z-index: 1;
+  }
+  .hero-inner {
+    display: grid; grid-template-columns: 1.4fr 1fr; gap: 4rem;
+    align-items: center;
+  }
+  .hero-eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.2em;
+    color: var(--accent); font-weight: 500; margin-bottom: 1.5rem;
+  }
+  .hero h1 {
+    font-size: clamp(2.5rem, 5vw, 3.8rem); font-weight: 800;
+    letter-spacing: -0.03em; line-height: 1.05; margin-bottom: 1.5rem;
+  }
+  .hero h1 em {
+    font-style: normal; color: var(--accent);
+    text-decoration: underline; text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+  }
+  .hero-tagline {
+    font-size: 1.1rem; color: var(--dim); max-width: 480px;
+    line-height: 1.7; font-weight: 300;
+  }
+  .hero-stats {
+    display: flex; flex-direction: column; gap: 1.2rem;
+    padding: 2rem; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 16px;
+    box-shadow: 0 20px 40px -15px rgba(0,0,0,0.15);
+  }
+  .hero-stat {
+    display: flex; align-items: baseline; gap: 0.8rem;
+  }
+  .hero-stat-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1.8rem; font-weight: 600; color: var(--accent);
+    min-width: 70px;
+  }
+  .hero-stat-label {
+    font-size: 0.95rem; color: var(--dim); line-height: 1.4;
+  }
+
+  /* Sections */
+  .sec { padding: 5rem 0; position: relative; z-index: 1; }
+  .sec-divider {
+    border: none; border-top: 1px solid var(--border); margin: 0;
+  }
+  .sec-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 1rem; text-transform: uppercase; letter-spacing: 0.15em;
+    color: var(--accent); font-weight: 700; margin-bottom: 0.6rem;
+  }
+  .sec-title {
+    font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 700;
+    letter-spacing: -0.02em; margin-bottom: 0.5rem;
+  }
+  .sec-sub {
+    font-size: 1rem; color: var(--dim); margin-bottom: 3rem;
+    max-width: 860px; font-weight: 300; line-height: 1.7;
+  }
+
+  /* Case / input split — asymmetric */
+  .case {
+    display: grid; grid-template-columns: 1.25fr 1fr; gap: 2.5rem;
+    align-items: start; margin-bottom: 2.5rem;
+  }
+  .case-img {
+    border-radius: 12px; border: 1px solid var(--border);
+    width: 100%; display: block;
+    transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .case-img:hover { transform: scale(1.02); }
+  .case-brief h3 {
+    font-size: 1.2rem; font-weight: 700; margin-bottom: 0.6rem;
+  }
+  .case-brief p {
+    color: var(--dim); line-height: 1.7; font-weight: 300;
+    margin-bottom: 1rem;
+  }
+  .pills { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .pill {
+    font-family: 'JetBrains Mono', monospace;
+    background: var(--surface-2); border-radius: 6px;
+    padding: 0.25rem 0.65rem; font-size: 0.75rem; font-weight: 500;
+    color: var(--text); border: 1px solid var(--border);
+    transition: border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .pill:hover { border-color: var(--accent); }
+  .caption {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem; color: var(--dim); margin-top: 0.8rem;
+    padding: 0.6rem 0;
+    border-top: 1px solid var(--border); letter-spacing: 0.02em;
+  }
+
+  /* Brand DNA input column */
+  .dna-block { margin-top: 0; }
+  .dna-row {
+    padding: 0.9rem 0; border-top: 1px solid var(--border);
+  }
+  .dna-row:last-child { border-bottom: 1px solid var(--border); }
+  .dna-row-title {
+    font-size: 0.95rem; font-weight: 600; margin-bottom: 0.2rem;
+  }
+  .dna-row-title .swatch {
+    display: inline-block; width: 0.8rem; height: 0.8rem;
+    border-radius: 3px; vertical-align: -1px; margin-left: 0.1rem;
+    border: 1px solid rgba(255,255,255,0.15);
+  }
+  .dna-row-desc { font-size: 0.85rem; color: var(--dim); font-weight: 300; line-height: 1.6; }
+
+  /* Machine flow — one line */
+  .flow {
+    display: flex; align-items: stretch; gap: 0.6rem;
+    margin-bottom: 1.5rem; flex-wrap: wrap;
+  }
+  .flow-node {
+    flex: 1 1 180px; min-width: 0;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 1.1rem 1.2rem;
+    transition: border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .flow-node:hover { border-color: var(--accent); }
+  .flow-node.is-machine {
+    flex: 1.4 1 220px;
+    background: var(--accent-dim); border-color: var(--accent);
+  }
+  .flow-kind {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.12em;
+    color: var(--dim); font-weight: 500; margin-bottom: 0.5rem;
+  }
+  .flow-node.is-machine .flow-kind { color: var(--accent); }
+  .flow-title { font-size: 0.95rem; font-weight: 600; margin-bottom: 0.3rem; }
+  .flow-desc { font-size: 0.82rem; color: var(--dim); font-weight: 300; line-height: 1.55; }
+  .flow-arrow {
+    display: flex; align-items: center; color: var(--accent);
+    font-size: 1.4rem; font-family: 'JetBrains Mono', monospace;
+  }
+  .flow-note {
+    font-size: 0.95rem; color: var(--dim); font-weight: 300;
+    line-height: 1.7; max-width: 820px;
+    border-left: 2px solid var(--accent); padding-left: 1rem;
+  }
+  .flow-note strong { color: var(--text); font-weight: 500; }
+
+  /* Output post showcase */
+  .post-row {
+    display: grid; grid-template-columns: 0.85fr 1fr; gap: 2.5rem;
+    align-items: start; margin-bottom: 1rem;
+  }
+  .post-row.flip .post-figure { order: 2; }
+  .post-img {
+    width: 100%; display: block; border-radius: 16px;
+    border: 1px solid var(--border);
+    box-shadow: 0 24px 50px -20px rgba(0,0,0,0.5);
+  }
+  .post-meta { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1rem; }
+  .post-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.08em;
+    padding: 0.25rem 0.6rem; border-radius: 100px;
+    background: var(--accent-dim); border: 1px solid var(--accent);
+    color: var(--accent); font-weight: 500;
+  }
+  .post-tag.neutral {
+    background: var(--surface-2); border-color: var(--border); color: var(--dim);
+  }
+  .post-headline { font-size: 1.3rem; font-weight: 700; margin-bottom: 0.8rem; letter-spacing: -0.01em; }
+  .cap-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.1em;
+    color: var(--dim); margin-bottom: 0.6rem;
+  }
+  .cap-body {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; padding: 1.2rem 1.3rem;
+    font-size: 0.92rem; line-height: 1.75; color: var(--text); font-weight: 300;
+    white-space: pre-line;
+  }
+  .cap-tags {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem; color: var(--accent); margin-top: 0.8rem;
+    line-height: 1.6; word-spacing: 0.1em;
+  }
+
+  /* Carousel */
+  .carousel-head {
+    display: flex; align-items: baseline; justify-content: space-between;
+    gap: 1rem; margin-bottom: 1rem; flex-wrap: wrap;
+  }
+  .carousel-hint {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.72rem; color: var(--dim); letter-spacing: 0.06em;
+  }
+  .carousel {
+    display: flex; gap: 1rem; overflow-x: auto; scroll-snap-type: x mandatory;
+    padding-bottom: 1rem; -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin; scrollbar-color: var(--border) transparent;
+  }
+  .carousel::-webkit-scrollbar { height: 6px; }
+  .carousel::-webkit-scrollbar-thumb { background: var(--border); border-radius: 100px; }
+  .carousel::-webkit-scrollbar-track { background: transparent; }
+  .carousel-item {
+    flex: 0 0 auto; width: 280px; scroll-snap-align: center;
+    position: relative;
+  }
+  .carousel-item img {
+    width: 100%; display: block; border-radius: 14px;
+    border: 1px solid var(--border);
+    box-shadow: 0 18px 40px -18px rgba(0,0,0,0.5);
+  }
+  .carousel-num {
+    position: absolute; top: 0.6rem; left: 0.6rem;
+    font-family: 'JetBrains Mono', monospace; font-size: 0.7rem;
+    background: rgba(9,9,11,0.7); color: #fafafa;
+    padding: 0.15rem 0.5rem; border-radius: 100px; backdrop-filter: blur(4px);
+  }
+  .dots { display: flex; gap: 0.4rem; justify-content: center; margin-top: 0.2rem; margin-bottom: 1.4rem; }
+  .dot {
+    width: 7px; height: 7px; border-radius: 50%;
+    background: var(--border); transition: background 0.3s, transform 0.3s;
+  }
+  .dot.active { background: var(--accent); transform: scale(1.3); }
+
+  /* Compare (proof) */
+  .compare {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 0;
+    margin-bottom: 1.5rem; border-radius: 16px; overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .compare-col { padding: 1.5rem; }
+  .compare-bad {
+    background: var(--red-dim); border-right: 1px solid var(--border);
+  }
+  .compare-good { background: var(--accent-dim); }
+  .compare-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.12em;
+    font-weight: 600; margin-bottom: 1rem;
+  }
+  .compare-bad .compare-label { color: var(--red); }
+  .compare-good .compare-label { color: var(--accent); }
+  .compare-text { font-size: 1rem; line-height: 1.9; color: var(--dim); font-weight: 300; }
+  .compare-good .compare-text { color: var(--text); font-weight: 400; }
+  .compare-text .li { display: block; padding: 0.15rem 0; }
+  .compare-callout {
+    border: 1px solid var(--accent);
+    border-radius: 12px; padding: 1.2rem 1.5rem;
+    font-size: 1rem; color: var(--text); text-align: center;
+    font-weight: 300;
+    background: var(--accent-dim);
+  }
+  .compare-callout strong {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--accent); font-weight: 600; font-size: 0.85rem;
+  }
+
+  /* Honesty note */
+  .honesty {
+    font-size: 0.85rem; color: var(--dim); font-weight: 300;
+    line-height: 1.7; background: var(--surface);
+    border: 1px dashed var(--border); border-radius: 12px;
+    padding: 1rem 1.3rem; margin-top: 1.5rem;
+  }
+  .honesty strong { color: var(--text); font-weight: 600; }
+
+  /* CTA */
+  .cta-section { padding: 5rem 0; position: relative; z-index: 1; }
+  .cta-inner { text-align: center; max-width: 520px; margin: 0 auto; }
+  .cta-portrait {
+    width: 140px; height: 140px; border-radius: 50%;
+    overflow: hidden; margin: 0 auto 2rem;
+    border: 1px solid var(--border);
+  }
+  .cta-portrait img { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .cta-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem; letter-spacing: 0.12em; text-transform: uppercase;
+    color: var(--dim); margin-bottom: 2rem;
+  }
+  .cta-inner .sec-label { margin-bottom: 0.8rem; }
+  .cta-title {
+    font-size: clamp(1.5rem, 3vw, 2.2rem); font-weight: 700;
+    letter-spacing: -0.02em; margin-bottom: 0.8rem; line-height: 1.15;
+  }
+  .cta-desc {
+    font-size: 1rem; color: var(--dim); line-height: 1.7;
+    font-weight: 300; margin-bottom: 2rem;
+  }
+  .cta-btn {
+    display: inline-block; padding: 0.9rem 2.5rem;
+    background: var(--accent); color: var(--bg);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.15em;
+    text-decoration: none; border-radius: 8px;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1),
+                box-shadow 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 0 4px 20px rgba(52,211,153,0.2);
+  }
+  .cta-btn:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 8px 30px rgba(52,211,153,0.3);
+  }
+  .cta-btn:active { transform: translateY(0) scale(0.98); }
+
+  /* Footer */
+  .foot {
+    border-top: 1px solid var(--border); padding: 3rem 0;
+    display: flex; justify-content: space-between; align-items: baseline;
+    position: relative; z-index: 1; gap: 1rem; flex-wrap: wrap;
+  }
+  .foot-brand {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.15em;
+    color: var(--accent); font-weight: 500;
+  }
+  .foot-links { display: flex; gap: 1.5rem; align-items: baseline; }
+  .foot-url { font-size: 0.85rem; color: var(--dim); font-weight: 300; text-decoration: none; }
+  .foot-url:hover { color: var(--accent); }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .wrap { padding: 0 1.2rem; }
+    .hero { padding: 4rem 0; }
+    .hero-inner { grid-template-columns: 1fr; gap: 2rem; }
+    .case { grid-template-columns: 1fr; gap: 1.5rem; }
+    .post-row { grid-template-columns: 1fr; gap: 1.5rem; }
+    .post-row.flip .post-figure { order: 0; }
+    .post-figure { max-width: 420px; margin: 0 auto; }
+    .flow { flex-direction: column; }
+    .flow-arrow { justify-content: center; transform: rotate(90deg); height: 1.4rem; }
+    .flow-node, .flow-node.is-machine { flex: 1 1 auto; }
+    .compare { grid-template-columns: 1fr; }
+    .compare-bad { border-right: none; border-bottom: 1px solid var(--border); }
+    .carousel-item { width: 78vw; max-width: 320px; }
+    .foot { flex-direction: column; gap: 0.8rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ASCII Background Texture -->
+<div class="ascii-bg">
+  <pre>
+                                      +*%#.        .*#%*+
+                                 =#%*.    -+##+-      .*%#=
+                              +%#-      +#*.  .*#+      -#%+
+                           =%#-       +#*        *#+       -%#=
+                        .#%-        =#*          *#=        -%#.
+                      +%+         -%#-            -#%-         +%+
+                    =%+          +%+                +%+          +%=
+                  -%+          .%#.    .+#####+.    .#%.          +%-
+                .%#.          -%#.   +#%*-  -*%#+   .#%-          .#%.
+               +%-           =%#.  =%#-        -#%=  .#%=           -%+
+             .%#            =#%. .#%-            -%#. .%#=            #%.
+            =%=            +%+  -%#                #%-  +%+            =%=
+           #%            .%#. +%+                  +%+ .#%.            %#
+         .%#            -%#. =%=      +#####+      =%=  #%-            #%.
+        -%+            =%#  +%-     =%*.   .*%=     -%+ .#%=            +%-
+       +%-            +%+ .%#     -%#.       .#%-    #%. +%+            -%+
+      #%.            #%- -%+    .%#.           #%.   +%- -%#            .%#
+     %#            .%#. +%-    +%-      .      -%+   -%+  #%.            #%
+    %#            -%#  +%=   .%#     -+#%#+.    #%.   =%+ .#%-            #%
+   %#            =%#  +%-   -%+    =%*. .*%=   +%-   -%+  #%=            #%
+  ##            +%+  #%.   +%=   -%#.     .#%- =%+   .%#  +%+            ##
+ ##            #%-  #%-   #%.  .%#    =#=   #%. %#   -%#  -%#            ##
+.#           -%#  .%#   =%=   +%-   =%#%=  -%+ =%=   #%.  #%-           #.
+#.          =%#   #%.  +%-   #%.  -%#. #%- +%=  -%+ .%#   #%=          .#
+#          +%+   %#   #%.  =%=  +%+    +%+ %#   .%# #%   +%+          #
+#         #%-  .%#  .%#  +%-  #%-      -%##%.    #%#%.  -%#         #
+#        #%   -%#   #%  #%.  %#         +%+      +%+   #%   #%        #
+#       %#   =%#   %#  %#  .%+                        +%.  #%   #%       #
+#      ##   +%+   ##  ##  +%                          %+  ##   +%+   ##      #
+#     .#   #%-   .#  .#  #%                          %#  #.   -%#   #.     #
+#     #   #%     #  #  %#                          #%  #  #     %#   #     #
+#    #   %#     #  #  ##                          ##  #  #     #%   #    #
+#    #  ##     #  #  #.                          .#  #  #     ##  #    #
+ #  #  #.     #  #  #                            #  #  #     .#  #  #
+  ##  #      # .#  #                            #  #. #      #  ##
+     #      # .#  #              ..              #  #. #      #
+           #  #  #           .+#%%#+.           #  #  #
+          #  #  #          =%#=   =#%=          #  #  #
+         #  #  #         +%+         +%+         #  #  #
+        .  #  #.        #%             %#        .#  #  .
+           #  #        %#               #%        #  #
+           #  #       ##                 ##       #  #
+              #.     .#                   #.     .#
+              #      #                     #      #
+              #.    .#                     #.    .#
+               #    #                       #    #
+               #    #                       #    #
+                #  #                         #  #
+                 ##                           ##
+  </pre>
+</div>
+
+<section class="hero">
+<div class="wrap">
+  <div class="hero-inner">
+    <div>
+      <div class="hero-eyebrow anim-up">Dark Gravity Labs &middot; Content Engine</div>
+      <h1 class="anim-up d1">Raw material in.<br><em>On-brand content out.</em></h1>
+      <p class="hero-tagline anim-up d2">The content machine for agencies and brands. Voice-of-market research and your client's brand DNA go in &mdash; finished, on-brand social posts come out. In their voice, not ChatGPT's. Every post is human-approved before it goes live.</p>
+      <p class="hero-tagline anim-up d2" style="margin-top: 0.8rem; color: var(--text); font-weight: 400;">The shop keeps running, even when you're not at your desk.</p>
+    </div>
+    <div class="hero-stats anim-up d3">
+      <div class="hero-stat">
+        <span class="hero-stat-num">3</span>
+        <span class="hero-stat-label">finished posts from one dataset</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-num">5</span>
+        <span class="hero-stat-label">slides in the carousel, one concept</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-num">1</span>
+        <span class="hero-stat-label">brand voice, consistent across the design</span>
+      </div>
+      <div class="hero-stat">
+        <span class="hero-stat-num">0</span>
+        <span class="hero-stat-label">stock photos, AI faces or slop</span>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<hr class="sec-divider">
+
+<!-- INPUT -->
+<section class="sec">
+<div class="wrap">
+  <div class="sec-label">Step 01: Input</div>
+  <div class="sec-title">What went in: the brand's own raw material</div>
+  <p class="sec-sub">None of this is invented. Before a single post exists, we x-ray the niche &mdash; real customer language from gutefrage, Reddit, YouTube and Trustpilot &mdash; and combine it with the client's brand DNA: logo, colours, tone of voice, existing copy and prices. Here is a real, unedited research excerpt (in German, the client's market).</p>
+
+  <div class="case">
+    <div>
+      <img class="case-img" src="screenshots/input-research.webp" alt="Unedited voice-of-market research excerpt: real customer language about dental insurance">
+      <div class="caption">Voice of Market &middot; gutefrage.net, Reddit r/Finanzen, YouTube, Trustpilot &middot; raw &amp; unedited</div>
+    </div>
+    <div class="case-brief">
+      <div class="sec-label" style="font-size:0.8rem;">+ Brand DNA</div>
+      <h3>What feeds the machine</h3>
+      <p>Market research supplies the language and the pain points. Brand DNA supplies the look and the tone. Together they make the difference between &bdquo;just another post&ldquo; and &bdquo;unmistakably your client&ldquo;.</p>
+      <div class="dna-block">
+        <div class="dna-row">
+          <div class="dna-row-title">Logo &amp; palette <span class="swatch" style="background:#F86030;"></span><span class="swatch" style="background:#70B050;"></span></div>
+          <div class="dna-row-desc">Checkfox Orange #F86030, Fox Green #70B050 &mdash; sampled from the real creatives, not guessed.</div>
+        </div>
+        <div class="dna-row">
+          <div class="dna-row-title">Tone of voice &amp; best existing hooks</div>
+          <div class="dna-row-desc">The strongest tone model from the existing copy &mdash; incl. &bdquo;Das Teuerste an deinen Z&auml;hnen ist das Warten.&ldquo;</div>
+        </div>
+        <div class="dna-row">
+          <div class="dna-row-title">Brand facts &amp; prices</div>
+          <div class="dna-row-desc">from &euro;7.70/month, T&Uuml;V 4.9/5, free &amp; independent &mdash; straight from the brand's own pages.</div>
+        </div>
+        <div class="dna-row">
+          <div class="dna-row-title">82 competitor ads</div>
+          <div class="dna-row-desc">What's said to death in the market (&bdquo;100% reimbursement, test winner&ldquo;) &mdash; and which gaps to own.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<hr class="sec-divider">
+
+<!-- MACHINE -->
+<section class="sec">
+<div class="wrap">
+  <div class="sec-label">Step 02: The Machine</div>
+  <div class="sec-title">One voice. Seven frames. One machine.</div>
+  <p class="sec-sub">Raw material becomes finished content &mdash; in one pass, with human approval before every post.</p>
+
+  <div class="flow">
+    <div class="flow-node">
+      <div class="flow-kind">Input</div>
+      <div class="flow-title">Raw material + brand DNA</div>
+      <div class="flow-desc">Voice-of-market, logo, palette, tone, prices.</div>
+    </div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-node is-machine">
+      <div class="flow-kind">The Machine</div>
+      <div class="flow-title">Research mining &rarr; concept &rarr; locked style guide &rarr; render</div>
+      <div class="flow-desc">The language layer and the brand layer are generated separately and merged cleanly.</div>
+    </div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-node">
+      <div class="flow-kind">Output</div>
+      <div class="flow-title">On-brand posts &amp; carousels</div>
+      <div class="flow-desc">With finished caption, hashtags and hook provenance.</div>
+    </div>
+    <div class="flow-arrow">&rarr;</div>
+    <div class="flow-node">
+      <div class="flow-kind">Control</div>
+      <div class="flow-title">Human approval</div>
+      <div class="flow-desc">Nothing goes out before a human signs off on it.</div>
+    </div>
+  </div>
+
+  <p class="flow-note">The style guide is <strong>locked once and reused identically across all seven frames</strong> &mdash; which is why the set reads as one designed campaign, not seven one-off AI images.</p>
+</div>
+</section>
+
+<hr class="sec-divider">
+
+<!-- OUTPUT -->
+<section class="sec">
+<div class="wrap">
+  <div class="sec-label">Step 03: Output</div>
+  <div class="sec-title">What came out: three finished posts</div>
+  <p class="sec-sub">Three concepts, one consistent design. Each post ships with its finished German caption &mdash; ready to post. (Captions shown in German, as published for this market.)</p>
+
+  <!-- Post 1 -->
+  <div class="post-row">
+    <div class="post-figure">
+      <img class="post-img" src="screenshots/post1-implantat-luecke.webp" alt="Checkfox Instagram post: the statutory fund pays 230 €, you pay 3,270 €">
+    </div>
+    <div>
+      <div class="post-meta">
+        <span class="post-tag">IG single</span>
+        <span class="post-tag neutral">Awareness</span>
+        <span class="post-tag neutral">Shock</span>
+      </div>
+      <div class="post-headline">&bdquo;230 &euro; vs. 3,270 &euro;&ldquo; &mdash; the statutory cost gap</div>
+      <div class="cap-label">Caption (German, as published)</div>
+      <div class="cap-body">Du zahlst seit Jahrzehnten brav in die gesetzliche Krankenkasse ein. Dann kommt die Zahnarztrechnung &ndash; und du merkst: Die Kasse &uuml;bernimmt fast nichts.
+
+Beispiel Implantat: rund 3.500 &euro; Gesamtkosten. Festzuschuss der Kasse: ca. 230 &euro;. Den Rest &ndash; bis zu 3.270 &euro; &ndash; zahlst du selbst. Willkommen in der &bdquo;Regelversorgung&ldquo;, dem gesetzlichen Minimum.
+
+Genau deshalb geben gesetzlich Versicherte in Deutschland jedes Jahr &uuml;ber 1 Milliarde &euro; aus eigener Tasche f&uuml;r Zahnersatz aus.
+
+Eine Zahnzusatzversicherung gibt's schon ab 7,70 &euro;/Monat. Wichtig: abschlie&szlig;en kannst du nur, solange noch nichts in Behandlung oder angeraten ist.
+
+&#128073; In 5 Minuten kostenlos &amp; unabh&auml;ngig vergleichen &ndash; mit echter Beratung statt anonymem Algorithmus. Link in Bio.</div>
+      <div class="cap-tags">#Zahnzusatzversicherung #Zahngesundheit #Zahnarzt #Krankenkasse #Implantat #Zahnersatz #Vorsorge #Checkfox</div>
+    </div>
+  </div>
+
+  <hr class="sec-divider" style="margin: 3.5rem 0;">
+
+  <!-- Post 2 — Carousel -->
+  <div class="carousel-head">
+    <div>
+      <div class="post-meta">
+        <span class="post-tag">IG carousel &middot; 5 slides</span>
+        <span class="post-tag neutral">Consideration</span>
+        <span class="post-tag neutral">Clarity</span>
+      </div>
+      <div class="post-headline" style="margin-bottom:0;">&bdquo;Tarifdschungel&ldquo; &mdash; the 4 things that actually matter</div>
+    </div>
+    <div class="carousel-hint">&larr; swipe through all 5 slides &rarr;</div>
+  </div>
+
+  <div class="carousel" id="carousel">
+    <div class="carousel-item"><span class="carousel-num">1 / 5</span><img src="screenshots/post2-tarifdschungel-slide1.webp" alt="Carousel slide 1: 9 out of 10 choose the wrong plan"></div>
+    <div class="carousel-item"><span class="carousel-num">2 / 5</span><img src="screenshots/post2-tarifdschungel-slide2.webp" alt="Carousel slide 2: 130+ plans nearly all promise the same thing"></div>
+    <div class="carousel-item"><span class="carousel-num">3 / 5</span><img src="screenshots/post2-tarifdschungel-slide3.webp" alt="Carousel slide 3: what actually matters"></div>
+    <div class="carousel-item"><span class="carousel-num">4 / 5</span><img src="screenshots/post2-tarifdschungel-slide4.webp" alt="Carousel slide 4: the expensive mistake"></div>
+    <div class="carousel-item"><span class="carousel-num">5 / 5</span><img src="screenshots/post2-tarifdschungel-slide5.webp" alt="Carousel slide 5: out of the jungle, CTA"></div>
+  </div>
+  <div class="dots" id="dots">
+    <span class="dot active"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span>
+  </div>
+
+  <div class="cap-label">Caption (German, as published)</div>
+  <div class="cap-body">&bdquo;Zahnzusatz? Ich nehm einfach den Billigsten.&ldquo; &ndash; der teuerste Satz im Tarifdschungel. &#128556;
+
+130+ Tarife, und fast alle werben mit denselben drei Versprechen: 100 % Erstattung, keine Wartezeit, Testsieger. Klingt &uuml;berall gleich. Worauf es wirklich ankommt, steht im Kleingedruckten:
+
+1&#65039;&#8419; Zahnersatz: zahlt der Tarif 60 % oder 90 %+? (der Tausende-Euro-Unterschied)
+2&#65039;&#8419; Wartezeit: Schutz ab Tag 1 &ndash; oder erst nach Monaten?
+3&#65039;&#8419; Prophylaxe: wie viel &euro; f&uuml;rs professionelle Z&auml;hne-Reinigen pro Jahr?
+4&#65039;&#8419; Beitrag: bleibt er auch mit 60 noch bezahlbar?
+
+Billig hei&szlig;t nicht sparen. Billig hei&szlig;t oft: zweimal auf den Stuhl.
+
+Einmal richtig aufgestellt &ndash; dann musst du nur noch ab und zu pr&uuml;fen. Wir vergleichen kostenlos &amp; unabh&auml;ngig, mit echtem Experten am Telefon.
+
+&#128073; Swipe f&uuml;r die 4 Punkte. Vergleich in der Bio. ab 7,70 &euro;/Monat &middot; T&Uuml;V 4,9/5.</div>
+  <div class="cap-tags">#Zahnzusatzversicherung #Versicherungsvergleich #Zahnersatz #Finanztipp #Z&auml;hne #Checkfox</div>
+
+  <hr class="sec-divider" style="margin: 3.5rem 0;">
+
+  <!-- Post 3 -->
+  <div class="post-row flip">
+    <div class="post-figure">
+      <img class="post-img" src="screenshots/post3-das-warten.webp" alt="Checkfox Instagram post: the most expensive thing about your teeth is waiting">
+    </div>
+    <div>
+      <div class="post-meta">
+        <span class="post-tag">IG single</span>
+        <span class="post-tag neutral">Decision</span>
+        <span class="post-tag neutral">Urgency + trust</span>
+      </div>
+      <div class="post-headline">&bdquo;Das Warten&ldquo; &mdash; urgency and the human-expert close</div>
+      <div class="cap-label">Caption (German, as published)</div>
+      <div class="cap-body">Abends beim Z&auml;hneputzen wandert deine Zunge wieder zu der einen Stelle. Du wei&szlig;t, da wartet was auf dich. Und du schiebst es weg.
+
+Das Problem: Eine Zahnzusatzversicherung kannst du nicht abschlie&szlig;en, wenn du sie schon brauchst. Laufende und bereits angeratene Behandlungen sind ausgeschlossen. Der einzige Moment ist jetzt &ndash; solange noch nichts passiert ist.
+
+Und die Angst &bdquo;die zahlen am Ende eh nicht&ldquo;? Beim richtigen Tarif reichst du vorher einen Kostenvoranschlag ein und bekommst schwarz auf wei&szlig;, was &uuml;bernommen wird.
+
+Wir sind Vergleichsexperten, keine Makler-Falle. Du sprichst mit einem echten Menschen, nicht mit einem Algorithmus. Kostenlos, unabh&auml;ngig, T&Uuml;V 4,9/5.
+
+&#128073; In 5 Minuten vergleichen. ab 7,70 &euro;/Monat. Link in Bio.</div>
+      <div class="cap-tags">#Zahnzusatzversicherung #Zahngesundheit #Vorsorge #ehrlichversichert #Checkfox</div>
+    </div>
+  </div>
+
+</div>
+</section>
+
+<hr class="sec-divider">
+
+<!-- PROOF -->
+<section class="sec">
+<div class="wrap">
+  <div class="sec-label">The Difference</div>
+  <div class="sec-title">Generic AI post vs. trained machine</div>
+  <p class="sec-sub">Same brief: &bdquo;Make an Instagram post for a dental-insurance comparison portal.&ldquo;</p>
+
+  <div class="compare">
+    <div class="compare-col compare-bad">
+      <div class="compare-label">Generic AI post</div>
+      <div class="compare-text">
+        <span class="li">A stock-photo smile that fits any brand whatsoever</span>
+        <span class="li">&bdquo;Protect your smile &ndash; compare and save today!&ldquo;</span>
+        <span class="li">Arbitrary fonts, arbitrary colours, zero recognition</span>
+        <span class="li">Interchangeable with every other insurance ad</span>
+        <span class="li">Talks about the product, not in the market's language</span>
+      </div>
+    </div>
+    <div class="compare-col compare-good">
+      <div class="compare-label">Trained on brand DNA + research</div>
+      <div class="compare-text">
+        <span class="li">Real market language: &bdquo;Willkommen in der Regelversorgung.&ldquo;</span>
+        <span class="li">Real numbers from the research: 230 &euro; vs. 3,270 &euro;</span>
+        <span class="li">Checkfox palette, logo and tone &ndash; instantly recognisable</span>
+        <span class="li">One consistent style across the whole series</span>
+        <span class="li">Hits the pain point instead of explaining the product</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="compare-callout">
+    Same brief. Same niche.<br>
+    The difference: <strong>brand-DNA training</strong>, <strong>real voice-of-market research</strong> and a <strong>locked style guide</strong> across the whole series.
+  </div>
+
+  <div class="honesty">
+    <strong>To be honest:</strong> what you see here is a content-machine sample, built from Checkfox's publicly available market material &mdash; not a live client engagement. We build exactly the same thing with your own material and your brand DNA.
+  </div>
+</div>
+</section>
+
+<section class="cta-section">
+<div class="wrap">
+  <div class="cta-inner">
+    <div class="cta-portrait"><img src="../portrait.jpg" alt="Dr. Yannik Zimmermann"></div>
+    <div class="cta-name">Dr. Yannik Zimmermann</div>
+    <div class="sec-label">Next step</div>
+    <div class="cta-title">I'll build you a sample on your own brand</div>
+    <p class="cta-desc">Pick one of your brands. I'll feed the content machine your material and show you what comes out.</p>
+    <a href="https://cal.com/darkgravitylabs-yannik/consult" class="cta-btn" target="_blank" rel="noopener">LET'S TALK</a>
+  </div>
+</div>
+</section>
+
+<footer>
+<div class="wrap">
+  <div class="foot">
+    <div class="foot-brand">Dark Gravity Labs</div>
+    <div class="foot-links">
+      <a class="foot-url" href="../ai-copy-engine/index-en.html">AI Copy Engine &rarr;</a>
+      <a class="foot-url" href="https://darkgravitylabs.com" target="_blank" rel="noopener">darkgravitylabs.com</a>
+    </div>
+  </div>
+</div>
+</footer>
+
+<script>
+  // Carousel dot indicator
+  (function () {
+    var car = document.getElementById('carousel');
+    var dots = document.getElementById('dots');
+    if (!car || !dots) return;
+    var items = car.querySelectorAll('.carousel-item');
+    var dotEls = dots.querySelectorAll('.dot');
+    function update() {
+      var center = car.scrollLeft + car.clientWidth / 2;
+      var best = 0, bestDist = Infinity;
+      items.forEach(function (it, i) {
+        var mid = it.offsetLeft + it.offsetWidth / 2;
+        var d = Math.abs(mid - center);
+        if (d < bestDist) { bestDist = d; best = i; }
+      });
+      dotEls.forEach(function (d, i) { d.classList.toggle('active', i === best); });
+    }
+    var raf;
+    car.addEventListener('scroll', function () {
+      if (raf) cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(update);
+    }, { passive: true });
+    dotEls.forEach(function (d, i) {
+      d.addEventListener('click', function () {
+        items[i].scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+      });
+    });
+  })();
+</script>
+
+</body>
+</html>

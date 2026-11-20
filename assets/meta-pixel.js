@@ -1,12 +1,13 @@
 // Meta pixel "Dark Gravity Labs" (dataset 3786194821530905, business portfolio "Yannik Zimmermann",
 // connected to ad account act_1567299535202899) for retargeting visitors of darkgravitylabs.com and
 // work.darkgravitylabs.com (Yannik 2026-11-20, https://ampcode.com/threads/T-01a1f8e8-39db-703e-84e9-9f6069376a05).
-// Part of the brand kit: every page of both sites loads /assets/meta-pixel.js. With ASK on, Meta loads only
-// after the visitor says yes in a small banner (EU law: the pixel needs consent first); the answer is kept
-// in localStorage. Any element with data-pixel-choice (the privacy page) clears the answer and asks again.
+// Part of the brand kit: every page of both sites loads /assets/meta-pixel.js. ASK is off (Yannik 2026-11-20,
+// "1b, drop the banner", same thread): Meta loads on every visit. With ASK on, Meta loads only after the
+// visitor says yes in a small banner; the answer is kept in localStorage. Any element with data-pixel-choice
+// (the privacy page's opt-out link) turns the pixel off for this browser, or with ASK on asks again.
 (function () {
   var ID = "3786194821530905";
-  var ASK = true;
+  var ASK = false;
   var KEY = "dgl-meta-pixel";
 
   function load() {
@@ -74,10 +75,17 @@
 
   function start() {
     var choice = get();
-    if (!ASK || choice === "yes") load();
-    else if (choice !== "no") ask();
+    if (choice === "no") {}
+    else if (!ASK || choice === "yes") load();
+    else ask();
     document.querySelectorAll("[data-pixel-choice]").forEach(function (el) {
-      el.addEventListener("click", function (e) { e.preventDefault(); set(null); ask(); });
+      el.addEventListener("click", function (e) {
+        e.preventDefault();
+        if (ASK) { set(null); ask(); return; }
+        set("no");
+        if (window.fbq) window.fbq("consent", "revoke");
+        el.textContent = el.getAttribute("data-pixel-choice") || "off";
+      });
     });
   }
 
